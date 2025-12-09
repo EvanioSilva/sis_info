@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sis_flutter/controller/detalhes_pessoa_controller.dart';
 import 'package:sis_flutter/model/pessoa_model.dart';
+import 'package:sis_flutter/model/vw_familia_responsavel_nova_renda_model.dart';
 import 'package:sis_flutter/utils/utils.dart';
 import 'package:sis_flutter/values/colors.dart';
 
@@ -20,73 +21,75 @@ class DetalhesPessoaPage extends StatelessWidget {
 
     return GetBuilder<DetalhesPessoaController>(
       builder: (controller) {
-    return Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
-        title: const Text('Detalhes da Pessoa'),
-        backgroundColor: primaryColor,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildHeaderCard(),
-            const SizedBox(height: 20),
-            _buildInfoSection('Informações Pessoais', Icons.person, [
-              _buildInfoRow('Nome', pessoa.nomPessoa ?? 'Não informado'),
-              _buildInfoRow(
-                'Data de Nascimento',
-                pessoa.dtaNascPessoa != null
-                    ? DateFormat('dd/MM/yyyy').format(pessoa.dtaNascPessoa!)
-                    : 'Não informado',
-              ),
-              _buildInfoRow(
-                  'Mãe', pessoa.nomCompletoMaePessoa ?? 'Não informado'),
-            ]),
-            const SizedBox(height: 20),
-            _buildInfoSection('Documentos', Icons.badge, [
-              _buildInfoRow('CPF', Utils.ofuscarDocumento(pessoa.numCpfPessoa)),
-              _buildInfoRow('NIS', Utils.ofuscarDocumento(pessoa.numNisPessoaAtual)),
-            ]),
-            const SizedBox(height: 20),
-            _buildInfoSection('Família', Icons.family_restroom, [
-              _buildInfoRow('Ordem',
-                  pessoa.numOrdemPessoa?.toString() ?? 'Não informado'),
-              _buildInfoRow(
-                  'Código Familiar', pessoa.codFamiliarFam ?? 'Não informado'),
-              _buildInfoRow('Tipo Responsável',
-                  pessoa.tipoResponsavel ?? 'Não informado'),
-              _buildInfoRow('ID Família',
-                  pessoa.idfamilia?.toString() ?? 'Não informado'),
-              _buildInfoRow(
-                  'ID Pessoa', pessoa.idpessoa?.toString() ?? 'Não informado'),
-            ]),
-            if (pessoa.temCadunico != null) ...[
-              const SizedBox(height: 20),
-              _buildInfoSection('Cadastro Único', Icons.assignment, [
-                _buildInfoRow(
-                  'Tem CadÚnico',
-                  pessoa.temCadunico == 'S' ? 'Sim' : 'Não',
-                ),
-              ]),
-            ],
-            const SizedBox(height: 20),
-            _buildFamiliaResponsavelSection(controller),
-            const SizedBox(height: 20),
-            _buildFamiliaPessoaSection(controller),
-            const SizedBox(height: 20),
-            _buildPessoaProgramaSection(controller),
-            const SizedBox(height: 20),
-            _buildNovaRendaMesSection(controller),
-            const SizedBox(height: 20),
-            _buildHistoricoSection(controller),
-          ],
-        ),
-      ),
-    );
+        return Scaffold(
+          backgroundColor: backgroundColor,
+          appBar: AppBar(
+            title: const Text('Detalhes da Pessoa'),
+            backgroundColor: primaryColor,
+            foregroundColor: Colors.white,
+            elevation: 0,
+          ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildHeaderCard(),
+                const SizedBox(height: 20),
+                _buildInfoSection('Informações Pessoais', Icons.person, [
+                  _buildInfoRow('Nome', pessoa.nomPessoa ?? 'Não informado'),
+                  _buildInfoRow(
+                    'Data de Nascimento',
+                    pessoa.dtaNascPessoa != null
+                        ? DateFormat('dd/MM/yyyy').format(pessoa.dtaNascPessoa!)
+                        : 'Não informado',
+                  ),
+                  _buildInfoRow(
+                      'Mãe', pessoa.nomCompletoMaePessoa ?? 'Não informado'),
+                ]),
+                const SizedBox(height: 20),
+                _buildInfoSection('Documentos', Icons.badge, [
+                  _buildInfoRow(
+                      'CPF', Utils.ofuscarDocumento(pessoa.numCpfPessoa)),
+                  _buildInfoRow(
+                      'NIS', Utils.ofuscarDocumento(pessoa.numNisPessoaAtual)),
+                ]),
+                const SizedBox(height: 20),
+                _buildInfoSection('Família', Icons.family_restroom, [
+                  _buildInfoRow('Ordem',
+                      pessoa.numOrdemPessoa?.toString() ?? 'Não informado'),
+                  _buildInfoRow('Código Familiar',
+                      pessoa.codFamiliarFam ?? 'Não informado'),
+                  _buildInfoRow('Tipo Responsável',
+                      pessoa.tipoResponsavel ?? 'Não informado'),
+                  _buildInfoRow('ID Família',
+                      pessoa.idfamilia?.toString() ?? 'Não informado'),
+                  _buildInfoRow('ID Pessoa',
+                      pessoa.idpessoa?.toString() ?? 'Não informado'),
+                ]),
+                if (pessoa.temCadunico != null) ...[
+                  const SizedBox(height: 20),
+                  _buildInfoSection('Cadastro Único', Icons.assignment, [
+                    _buildInfoRow(
+                      'Tem CadÚnico',
+                      pessoa.temCadunico == 'S' ? 'Sim' : 'Não',
+                    ),
+                  ]),
+                ],
+                const SizedBox(height: 20),
+                _buildFamiliaResponsavelSection(controller),
+                const SizedBox(height: 20),
+                _buildFamiliaPessoaSection(controller),
+                const SizedBox(height: 20),
+                _buildPessoaProgramaSection(controller),
+                const SizedBox(height: 20),
+                _buildNovaRendaMesSection(controller),
+                const SizedBox(height: 20),
+                _buildHistoricoSection(controller),
+              ],
+            ),
+          ),
+        );
       },
     );
   }
@@ -97,7 +100,10 @@ class DetalhesPessoaPage extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [primaryColor.withOpacity(0.9), primaryColor.withOpacity(0.7)],
+          colors: [
+            primaryColor.withOpacity(0.9),
+            primaryColor.withOpacity(0.7)
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -204,7 +210,10 @@ class DetalhesPessoaPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [primaryColor.withOpacity(0.1), primaryColor.withOpacity(0.05)],
+                colors: [
+                  primaryColor.withOpacity(0.1),
+                  primaryColor.withOpacity(0.05)
+                ],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               ),
@@ -310,33 +319,259 @@ class DetalhesPessoaPage extends StatelessWidget {
       id: 'familia_responsavel',
       builder: (ctrl) {
         if (ctrl.isWaitingFamiliaResponsavel) {
-          return _buildLoadingSection('Dados da Família Responsável', Icons.supervisor_account);
+          return _buildLoadingSection(
+              'Dados da Família Responsável', Icons.supervisor_account);
         }
 
         if (ctrl.familiaResponsavelDados.isEmpty) {
-          return _buildEmptySection('Dados da Família Responsável', 'Nenhum dado encontrado', Icons.supervisor_account);
+          return _buildEmptySection('Dados da Família Responsável',
+              'Nenhum dado encontrado', Icons.supervisor_account);
         }
 
-        return _buildDataSection(
-          'Dados da Família Responsável',
-          ctrl.familiaResponsavelDados.first,
-          {
-            'EntidadeVwFamiliaResponsavelNovaRenda.cod_familiar_fam': 'codFamiliarFam',
-            'EntidadeVwFamiliaResponsavelNovaRenda.num_nis_pessoa_atual': 'numNisPessoaAtual',
-            'EntidadeVwFamiliaResponsavelNovaRenda.num_cpf_pessoa': 'numCpfPessoa',
-            'EntidadeVwFamiliaResponsavelNovaRenda.vlrrenda': 'vlrrenda',
-            'EntidadeVwFamiliaResponsavelNovaRenda.vl_renda_percapta_original': 'vlRendaPercaptaOriginal',
-            'EntidadeVwFamiliaResponsavelNovaRenda.estado_cadastral': 'estadoCadastral',
-            'EntidadeVwFamiliaResponsavelNovaRenda.dta_entrevista_fam': 'dtaEntrevistaFam',
-            'EntidadeVwFamiliaResponsavelNovaRenda.dt_ult_atualizacao': 'dtUltAtualizacao',
-            'EntidadeVwFamiliaResponsavelNovaRenda.dt_cdstr_atual_fmla': 'dtCdstrAtualFmla',
-            'EntidadeVwFamiliaResponsavelNovaRenda.tem_menor_aprendiz': 'temMenorAprendiz',
-            'EntidadeVwFamiliaResponsavelNovaRenda.dt_gradativo': 'dtGradativo',
-          },
-          controller,
-          Icons.supervisor_account,
-        );
+        return _buildFamiliaResponsavelDataSection(ctrl.familiaResponsavelDados.first, controller);
       },
+    );
+  }
+
+  Widget _buildFamiliaResponsavelDataSection(VwFamiliaResponsavelNovaRendaModel data, DetalhesPessoaController controller) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 2),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 15,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(
+          color: Colors.grey[100]!,
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [primaryColor.withOpacity(0.1), primaryColor.withOpacity(0.05)],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.supervisor_account, color: Colors.blue, size: 18),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text(
+                    'Dados da Família Responsável',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                // Primeira linha: Documentos
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildModernInfoCard(
+                        'Código Familiar',
+                        data.codFamiliarFam ?? 'Não informado',
+                        Icons.family_restroom,
+                        Colors.purple,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildModernInfoCard(
+                        'Estado Cadastral',
+                        data.estadoCadastral ?? 'Não informado',
+                        Icons.verified_user,
+                        Colors.green,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Segunda linha: Documentos pessoais
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildModernInfoCard(
+                        'CPF',
+                        Utils.ofuscarDocumento(data.numCpfPessoa),
+                        Icons.credit_card,
+                        Colors.orange,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildModernInfoCard(
+                        'NIS',
+                        Utils.ofuscarDocumento(data.numNisPessoaAtual),
+                        Icons.badge,
+                        Colors.teal,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Terceira linha: Rendas
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildModernInfoCard(
+                        'RPC Calculada',
+                        controller.formatarValor(data.vlrrenda),
+                        Icons.trending_up,
+                        Colors.blue,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildModernInfoCard(
+                        'RPC Original',
+                        controller.formatarValor(data.vlRendaPercaptaOriginal),
+                        Icons.account_balance_wallet,
+                        Colors.indigo,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Quarta linha: Status e programas
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildModernInfoCard(
+                        'Jovem Aprendiz',
+                        (data.temMenorAprendiz == 'S') ? 'Sim' : 'Não',
+                        Icons.school,
+                        Colors.amber,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildModernInfoCard(
+                        'Data Entrevista',
+                        controller.formatarValor(data.dtaEntrevistaFam),
+                        Icons.calendar_today,
+                        Colors.cyan,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Quinta linha: Datas importantes
+                _buildModernInfoCard(
+                  'Última Atualização',
+                  controller.formatarValor(data.dtUltAtualizacao),
+                  Icons.update,
+                  Colors.grey,
+                  isFullWidth: true,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModernInfoCard(String label, String value, IconData icon, Color color, {bool isFullWidth = false}) {
+    return Container(
+      width: isFullWidth ? double.infinity : null,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: color.withOpacity(0.2),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 16,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[600],
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+              height: 1.3,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 
@@ -349,24 +584,34 @@ class DetalhesPessoaPage extends StatelessWidget {
         }
 
         if (ctrl.familiaPessoaDados.isEmpty) {
-          return _buildEmptySection('Dados da Família Pessoa', 'Nenhum dado encontrado', Icons.people);
+          return _buildEmptySection('Dados da Família Pessoa',
+              'Nenhum dado encontrado', Icons.people);
         }
 
         return _buildDataSection(
           'Dados da Família Pessoa',
           ctrl.familiaPessoaDados.first,
           {
-            'EntidadeVwFamiliaPessoaNovaRenda.num_ordem_pessoa': 'numOrdemPessoa',
-            'EntidadeVwFamiliaPessoaNovaRenda.num_nis_pessoa_atual': 'numNisPessoaAtual',
+            'EntidadeVwFamiliaPessoaNovaRenda.num_ordem_pessoa':
+                'numOrdemPessoa',
+            'EntidadeVwFamiliaPessoaNovaRenda.num_nis_pessoa_atual':
+                'numNisPessoaAtual',
             'EntidadeVwFamiliaPessoaNovaRenda.num_cpf_pessoa': 'numCpfPessoa',
             'EntidadeVwFamiliaPessoaNovaRenda.vlrrenda': 'vlrrenda',
-            'EntidadeVwFamiliaPessoaNovaRenda.vl_renda_percapta_original': 'vlRendaPercaptaOriginal',
-            'EntidadeVwFamiliaPessoaNovaRenda.estado_cadastral': 'estadoCadastral',
-            'EntidadeVwFamiliaPessoaNovaRenda.dta_entrevista_fam': 'dtaEntrevistaFam',
-            'EntidadeVwFamiliaPessoaNovaRenda.dt_ult_atualizacao': 'dtUltAtualizacao',
-            'EntidadeVwFamiliaPessoaNovaRenda.dt_cdstr_atual_fmla': 'dtCdstrAtualFmla',
-            'EntidadeVwFamiliaPessoaNovaRenda.EdtStatusCadastro': 'edtStatusCadastro',
-            'EntidadeVwFamiliaPessoaNovaRenda.tem_menor_aprendiz': 'temMenorAprendiz',
+            'EntidadeVwFamiliaPessoaNovaRenda.vl_renda_percapta_original':
+                'vlRendaPercaptaOriginal',
+            'EntidadeVwFamiliaPessoaNovaRenda.estado_cadastral':
+                'estadoCadastral',
+            'EntidadeVwFamiliaPessoaNovaRenda.dta_entrevista_fam':
+                'dtaEntrevistaFam',
+            'EntidadeVwFamiliaPessoaNovaRenda.dt_ult_atualizacao':
+                'dtUltAtualizacao',
+            'EntidadeVwFamiliaPessoaNovaRenda.dt_cdstr_atual_fmla':
+                'dtCdstrAtualFmla',
+            'EntidadeVwFamiliaPessoaNovaRenda.EdtStatusCadastro':
+                'edtStatusCadastro',
+            'EntidadeVwFamiliaPessoaNovaRenda.tem_menor_aprendiz':
+                'temMenorAprendiz',
             'EntidadeVwFamiliaPessoaNovaRenda.dt_gradativo': 'dtGradativo',
           },
           controller,
@@ -381,16 +626,22 @@ class DetalhesPessoaPage extends StatelessWidget {
       id: 'pessoa_programa',
       builder: (ctrl) {
         if (ctrl.isWaitingPessoaPrograma) {
-          return _buildLoadingSection('Programas Sociais', Icons.business_center);
+          return _buildLoadingSection(
+              'Programas Sociais', Icons.business_center);
         }
 
         if (ctrl.pessoaProgramaDados.isEmpty) {
-          return _buildEmptySection('Programas Sociais', 'Nenhum programa encontrado', Icons.business_center);
+          return _buildEmptySection('Programas Sociais',
+              'Nenhum programa encontrado', Icons.business_center);
         }
 
         return _buildInfoSection('Programas Sociais', Icons.business_center, [
-          _buildInfoRow('Total de Programas', ctrl.pessoaProgramaDados.length.toString()),
-          _buildInfoRow('ID Família', ctrl.pessoaProgramaDados.first.idfamilia?.toString() ?? 'Não informado'),
+          _buildInfoRow(
+              'Total de Programas', ctrl.pessoaProgramaDados.length.toString()),
+          _buildInfoRow(
+              'ID Família',
+              ctrl.pessoaProgramaDados.first.idfamilia?.toString() ??
+                  'Não informado'),
         ]);
       },
     );
@@ -405,12 +656,17 @@ class DetalhesPessoaPage extends StatelessWidget {
         }
 
         if (ctrl.novaRendaMesDados.isEmpty) {
-          return _buildEmptySection('Renda Mensal', 'Nenhum dado de renda encontrado', Icons.attach_money);
+          return _buildEmptySection('Renda Mensal',
+              'Nenhum dado de renda encontrado', Icons.attach_money);
         }
 
         return _buildInfoSection('Renda Mensal', Icons.attach_money, [
-          _buildInfoRow('Registros de Renda', ctrl.novaRendaMesDados.length.toString()),
-          _buildInfoRow('ID Família', ctrl.novaRendaMesDados.first.idfamilia?.toString() ?? 'Não informado'),
+          _buildInfoRow(
+              'Registros de Renda', ctrl.novaRendaMesDados.length.toString()),
+          _buildInfoRow(
+              'ID Família',
+              ctrl.novaRendaMesDados.first.idfamilia?.toString() ??
+                  'Não informado'),
         ]);
       },
     );
@@ -425,12 +681,17 @@ class DetalhesPessoaPage extends StatelessWidget {
         }
 
         if (ctrl.historicoDados.isEmpty) {
-          return _buildEmptySection('Histórico', 'Nenhum histórico encontrado', Icons.history);
+          return _buildEmptySection(
+              'Histórico', 'Nenhum histórico encontrado', Icons.history);
         }
 
         return _buildInfoSection('Histórico', Icons.history, [
-          _buildInfoRow('Total de Registros', ctrl.historicoDados.length.toString()),
-          _buildInfoRow('ID Família', ctrl.historicoDados.first.idfamilia?.toString() ?? 'Não informado'),
+          _buildInfoRow(
+              'Total de Registros', ctrl.historicoDados.length.toString()),
+          _buildInfoRow(
+              'ID Família',
+              ctrl.historicoDados.first.idfamilia?.toString() ??
+                  'Não informado'),
         ]);
       },
     );
@@ -522,7 +783,12 @@ class DetalhesPessoaPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDataSection(String title, dynamic data, Map<String, String> fieldMapping, DetalhesPessoaController controller, IconData icon) {
+  Widget _buildDataSection(
+      String title,
+      dynamic data,
+      Map<String, String> fieldMapping,
+      DetalhesPessoaController controller,
+      IconData icon) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
