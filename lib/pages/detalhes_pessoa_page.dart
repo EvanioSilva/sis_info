@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:sis_flutter/controller/detalhes_pessoa_controller.dart';
 import 'package:sis_flutter/model/pessoa_model.dart';
 import 'package:sis_flutter/model/vw_familia_responsavel_nova_renda_model.dart';
+import 'package:sis_flutter/model/vw_familia_pessoa_nova_renda_model.dart';
 import 'package:sis_flutter/utils/utils.dart';
 import 'package:sis_flutter/values/colors.dart';
 
@@ -515,6 +516,195 @@ class DetalhesPessoaPage extends StatelessWidget {
     );
   }
 
+  Widget _buildFamiliaPessoaDataSection(VwFamiliaPessoaNovaRendaModel data, DetalhesPessoaController controller) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 2),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 15,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(
+          color: Colors.grey[100]!,
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [primaryColor.withOpacity(0.1), primaryColor.withOpacity(0.05)],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.people, color: Colors.green, size: 18),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text(
+                    'Dados da Família Pessoa',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                // Primeira linha: Ordem e Estado Cadastral
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildModernInfoCard(
+                        'Ordem',
+                        data.numOrdemPessoa?.toString() ?? 'Não informado',
+                        Icons.format_list_numbered,
+                        Colors.purple,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildModernInfoCard(
+                        'Estado Cadastral',
+                        data.estadoCadastral ?? 'Não informado',
+                        Icons.verified_user,
+                        Colors.green,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Segunda linha: Documentos pessoais
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildModernInfoCard(
+                        'CPF',
+                        Utils.ofuscarDocumento(data.numCpfPessoa),
+                        Icons.credit_card,
+                        Colors.orange,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildModernInfoCard(
+                        'NIS',
+                        Utils.ofuscarDocumento(data.numNisPessoaAtual),
+                        Icons.badge,
+                        Colors.teal,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Terceira linha: Rendas
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildModernInfoCard(
+                        'RPC Calculada',
+                        controller.formatarValor(data.vlrrenda),
+                        Icons.trending_up,
+                        Colors.blue,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildModernInfoCard(
+                        'RPC Original',
+                        controller.formatarValor(data.vlRendaPercaptaOriginal),
+                        Icons.account_balance_wallet,
+                        Colors.indigo,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Quarta linha: Status e programas
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildModernInfoCard(
+                        'Status Cadastro',
+                        data.edtStatusCadastro ?? 'Não informado',
+                        Icons.assignment_turned_in,
+                        Colors.amber,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildModernInfoCard(
+                        'Jovem Aprendiz',
+                        (data.temMenorAprendiz == 'S') ? 'Sim' : 'Não',
+                        Icons.school,
+                        Colors.pink,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Quinta linha: Datas importantes
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildModernInfoCard(
+                        'Data Entrevista',
+                        controller.formatarValor(data.dtaEntrevistaFam),
+                        Icons.calendar_today,
+                        Colors.cyan,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildModernInfoCard(
+                        'Última Atualização',
+                        controller.formatarValor(data.dtUltAtualizacao),
+                        Icons.update,
+                        Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildModernInfoCard(
       String label, String value, IconData icon, Color color,
       {bool isFullWidth = false}) {
@@ -597,35 +787,7 @@ class DetalhesPessoaPage extends StatelessWidget {
               'Nenhum dado encontrado', Icons.people);
         }
 
-        return _buildDataSection(
-          'Dados da Família Pessoa',
-          ctrl.familiaPessoaDados.first,
-          {
-            'EntidadeVwFamiliaPessoaNovaRenda.num_ordem_pessoa':
-                'numOrdemPessoa',
-            'EntidadeVwFamiliaPessoaNovaRenda.num_nis_pessoa_atual':
-                'numNisPessoaAtual',
-            'EntidadeVwFamiliaPessoaNovaRenda.num_cpf_pessoa': 'numCpfPessoa',
-            'EntidadeVwFamiliaPessoaNovaRenda.vlrrenda': 'vlrrenda',
-            'EntidadeVwFamiliaPessoaNovaRenda.vl_renda_percapta_original':
-                'vlRendaPercaptaOriginal',
-            'EntidadeVwFamiliaPessoaNovaRenda.estado_cadastral':
-                'estadoCadastral',
-            'EntidadeVwFamiliaPessoaNovaRenda.dta_entrevista_fam':
-                'dtaEntrevistaFam',
-            'EntidadeVwFamiliaPessoaNovaRenda.dt_ult_atualizacao':
-                'dtUltAtualizacao',
-            'EntidadeVwFamiliaPessoaNovaRenda.dt_cdstr_atual_fmla':
-                'dtCdstrAtualFmla',
-            'EntidadeVwFamiliaPessoaNovaRenda.EdtStatusCadastro':
-                'edtStatusCadastro',
-            'EntidadeVwFamiliaPessoaNovaRenda.tem_menor_aprendiz':
-                'temMenorAprendiz',
-            'EntidadeVwFamiliaPessoaNovaRenda.dt_gradativo': 'dtGradativo',
-          },
-          controller,
-          Icons.people,
-        );
+        return _buildFamiliaPessoaDataSection(ctrl.familiaPessoaDados.first, controller);
       },
     );
   }
