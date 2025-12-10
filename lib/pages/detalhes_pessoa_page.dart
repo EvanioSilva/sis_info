@@ -516,7 +516,8 @@ class DetalhesPessoaPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFamiliaPessoaDataSection(VwFamiliaPessoaNovaRendaModel data, DetalhesPessoaController controller) {
+  Widget _buildFamiliaPessoaDataSection(
+      VwFamiliaPessoaNovaRendaModel data, DetalhesPessoaController controller) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 2),
       decoration: BoxDecoration(
@@ -541,7 +542,10 @@ class DetalhesPessoaPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [primaryColor.withOpacity(0.1), primaryColor.withOpacity(0.05)],
+                colors: [
+                  primaryColor.withOpacity(0.1),
+                  primaryColor.withOpacity(0.05)
+                ],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               ),
@@ -558,7 +562,8 @@ class DetalhesPessoaPage extends StatelessWidget {
                     color: primaryColor.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.people, color: Colors.green, size: 18),
+                  child:
+                      const Icon(Icons.people, color: Colors.green, size: 18),
                 ),
                 const SizedBox(width: 12),
                 const Expanded(
@@ -787,7 +792,8 @@ class DetalhesPessoaPage extends StatelessWidget {
               'Nenhum dado encontrado', Icons.people);
         }
 
-        return _buildFamiliaPessoaDataSection(ctrl.familiaPessoaDados.first, controller);
+        return _buildFamiliaPessoaDataSection(
+            ctrl.familiaPessoaDados.first, controller);
       },
     );
   }
@@ -953,6 +959,4 @@ class DetalhesPessoaPage extends StatelessWidget {
       ),
     );
   }
-
-
 }
