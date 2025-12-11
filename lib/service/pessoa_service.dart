@@ -9,43 +9,7 @@ import 'package:sis_flutter/model/vw_nova_renda_mes_model.dart';
 import 'package:sis_flutter/model/vw_historico_familia_pessoa_model.dart';
 
 class PessoaService extends GetxService {
-  static const String baseUrl = 'http://pray4ever.net/api';
-
-  /// Busca a URL base dinamicamente do endpoint grok
-  Future<String> _obterUrlBase() async {
-    try {
-      final uri = Uri.parse('$baseUrl/servico/pesquisar/grok');
-
-      final response = await http.get(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      ).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () {
-          throw Exception('Tempo de requisição excedido ao buscar URL base');
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonResponse = json.decode(response.body);
-        final String? urlBase = jsonResponse['valor'] as String?;
-
-        if (urlBase == null || urlBase.isEmpty) {
-          throw Exception('URL base não encontrada na resposta');
-        }
-
-        return urlBase;
-      } else {
-        throw Exception(
-            'Erro ao buscar URL base: ${response.statusCode} - ${response.body}');
-      }
-    } catch (e) {
-      throw Exception('Erro ao obter URL base: ${e.toString()}');
-    }
-  }
+  static const String baseUrl = 'https://unseraphic-nonselective-shantae.ngrok-free.dev/api/sis';
 
   /// Pesquisa pessoas na API
   /// Todos os parâmetros são opcionais
@@ -88,10 +52,7 @@ class PessoaService extends GetxService {
         queryParams['tipoResponsavel'] = tipoResponsavel;
       }
 
-      // Obter a URL base dinamicamente
-      final String urlBase = await _obterUrlBase();
-
-      final uri = Uri.parse('$urlBase/PesquisarPessoas').replace(
+      final uri = Uri.parse('$baseUrl/PesquisarPessoas').replace(
         queryParameters: queryParams.isEmpty ? null : queryParams,
       );
 
@@ -142,8 +103,7 @@ class PessoaService extends GetxService {
         queryParams['idfamilia'] = idfamilia.toString();
       }
 
-      final String urlBase = await _obterUrlBase();
-      final uri = Uri.parse('$urlBase/PesquisarVwFamiliaResponsavelNovaRenda').replace(
+      final uri = Uri.parse('$baseUrl/PesquisarVwFamiliaResponsavelNovaRenda').replace(
         queryParameters: queryParams.isEmpty ? null : queryParams,
       );
 
@@ -188,8 +148,7 @@ class PessoaService extends GetxService {
         queryParams['idfamilia'] = idfamilia.toString();
       }
 
-      final String urlBase = await _obterUrlBase();
-      final uri = Uri.parse('$urlBase/PesquisarVwFamiliaPessoaNovaRenda').replace(
+      final uri = Uri.parse('$baseUrl/PesquisarVwFamiliaPessoaNovaRenda').replace(
         queryParameters: queryParams.isEmpty ? null : queryParams,
       );
 
@@ -234,8 +193,7 @@ class PessoaService extends GetxService {
         queryParams['idfamilia'] = idfamilia.toString();
       }
 
-      final String urlBase = await _obterUrlBase();
-      final uri = Uri.parse('$urlBase/PesquisarVwPessoaProgramaNovaRenda').replace(
+      final uri = Uri.parse('$baseUrl/PesquisarVwPessoaProgramaNovaRenda').replace(
         queryParameters: queryParams.isEmpty ? null : queryParams,
       );
 
@@ -280,8 +238,7 @@ class PessoaService extends GetxService {
         queryParams['idfamilia'] = idfamilia.toString();
       }
 
-      final String urlBase = await _obterUrlBase();
-      final uri = Uri.parse('$urlBase/PesquisarVwNovaRendaMes').replace(
+      final uri = Uri.parse('$baseUrl/PesquisarVwNovaRendaMes').replace(
         queryParameters: queryParams.isEmpty ? null : queryParams,
       );
 
@@ -326,8 +283,7 @@ class PessoaService extends GetxService {
         queryParams['idfamilia'] = idfamilia.toString();
       }
 
-      final String urlBase = await _obterUrlBase();
-      final uri = Uri.parse('$urlBase/PesquisarVwHistoricoFamiliaPessoa').replace(
+      final uri = Uri.parse('$baseUrl/PesquisarVwHistoricoFamiliaPessoa').replace(
         queryParameters: queryParams.isEmpty ? null : queryParams,
       );
 
