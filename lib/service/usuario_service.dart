@@ -7,39 +7,40 @@ class UsuarioService extends GetxService {
   static const String baseUrl = 'http://pray4ever.net/api';
 
   /// Busca a URL base dinamicamente do endpoint grok
-  Future<String> _obterUrlBase() async {
-    try {
-      final uri = Uri.parse('$baseUrl/servico/pesquisar/grok');
+  String _obterUrlBase() {
+    return 'https://unseraphic-nonselective-shantae.ngrok-free.dev/api/sis';
+    // try {
+    //   final uri = Uri.parse('$baseUrl/servico/pesquisar/grok');
 
-      final response = await http.get(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      ).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () {
-          throw Exception('Tempo de requisição excedido ao buscar URL base');
-        },
-      );
+    //   final response = await http.get(
+    //     uri,
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       'Accept': 'application/json',
+    //     },
+    //   ).timeout(
+    //     const Duration(seconds: 30),
+    //     onTimeout: () {
+    //       throw Exception('Tempo de requisição excedido ao buscar URL base');
+    //     },
+    //   );
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonResponse = json.decode(response.body);
-        final String? urlBase = jsonResponse['valor'] as String?;
+    //   if (response.statusCode == 200) {
+    //     final Map<String, dynamic> jsonResponse = json.decode(response.body);
+    //     final String? urlBase = jsonResponse['valor'] as String?;
 
-        if (urlBase == null || urlBase.isEmpty) {
-          throw Exception('URL base não encontrada na resposta');
-        }
+    //     if (urlBase == null || urlBase.isEmpty) {
+    //       throw Exception('URL base não encontrada na resposta');
+    //     }
 
-        return urlBase;
-      } else {
-        throw Exception(
-            'Erro ao buscar URL base: ${response.statusCode} - ${response.body}');
-      }
-    } catch (e) {
-      throw Exception('Erro ao obter URL base: ${e.toString()}');
-    }
+    //     return urlBase;
+    //   } else {
+    //     throw Exception(
+    //         'Erro ao buscar URL base: ${response.statusCode} - ${response.body}');
+    //   }
+    // } catch (e) {
+    //   throw Exception('Erro ao obter URL base: ${e.toString()}');
+    // }
   }
 
   /// Autentica um usuário na API
@@ -48,8 +49,7 @@ class UsuarioService extends GetxService {
   Future<Usuario> autenticar(Usuario usuario) async {
     try {
       // Obter a URL base dinamicamente
-      final String urlBase = await _obterUrlBase();
-
+      final String urlBase = _obterUrlBase();
       final uri = Uri.parse('$urlBase/autenticar');
 
       // Converter o usuário para JSON
@@ -91,9 +91,3 @@ class UsuarioService extends GetxService {
     }
   }
 }
-
-
-
-
-
-
