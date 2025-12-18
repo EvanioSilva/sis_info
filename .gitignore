@@ -73,3 +73,10 @@ firestore-debug.log
 # Environment variables
 .env
 .env.local
+
+# APK files
+*.apk
+*.aab
+
+# Metadata
+.metadata

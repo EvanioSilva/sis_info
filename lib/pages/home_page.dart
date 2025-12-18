@@ -2,49 +2,118 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sis_flutter/values/colors.dart';
 import 'package:sis_flutter/app_controller.dart';
+
+class _FadeInAnimation extends StatefulWidget {
+  final Widget child;
+  final Duration delay;
+
+  const _FadeInAnimation({
+    required this.child,
+    this.delay = Duration.zero,
+  });
+
+  @override
+  State<_FadeInAnimation> createState() => _FadeInAnimationState();
+}
+
+class _FadeInAnimationState extends State<_FadeInAnimation>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
+
+    Future.delayed(widget.delay, () {
+      if (mounted) {
+        _animationController.forward();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: widget.child,
+      ),
+    );
+  }
+}
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Container(
-          color: backgroundColor,
-          child: Stack(
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
             children: [
-              ListView(
-                padding: const EdgeInsets.symmetric(vertical: 0),
-                children: [
-                  Stack(
-                    children: [
-                      _LoggedBarWidget(),
-                      Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Container(
-                          margin: const EdgeInsets.only(top: 80.0),
-                          child: _TrocarContaWidget(),
-                        ),
+              _LoggedBarWidget(),
+              Container(
+                decoration: BoxDecoration(
+                  color: backgroundColor,
+                ),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    _FadeInAnimation(
+                      delay: const Duration(milliseconds: 200),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: _TrocarContaWidget(),
                       ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        _AcoesHistoricoWidget(),
-                        _AcoesWidget(),
-                        _OutrasAcoesWidget(),
-                        const SizedBox(height: 20),
-                        _AppVersionWidget(),
-                      ],
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 25),
+                    _FadeInAnimation(
+                      delay: const Duration(milliseconds: 400),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: _AcoesGridWidget(),
+                      ),
+                    ),
+                    const SizedBox(height: 25),
+                    _FadeInAnimation(
+                      delay: const Duration(milliseconds: 600),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: _AppVersionWidget(),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
             ],
           ),
@@ -60,62 +129,114 @@ class _LoggedBarWidget extends StatelessWidget {
     return GetBuilder<AppController>(
       builder: (controller) {
         final loginUsuario = controller.usuarioAutenticado?.login ?? '';
-        final mensagemBemVindo =
-            loginUsuario.isNotEmpty ? 'Bem vindo, $loginUsuario' : 'Bem vindo';
 
         return Container(
-          color: primaryColor,
-          height: 180,
-          child: Padding(
-            padding: const EdgeInsets.only(
-              top: 10,
-              left: 0,
-              right: 5,
+          height: 110,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                primaryColor,
+                primaryColor.withOpacity(0.9),
+              ],
             ),
-            child: ListTile(
-              title: Text(
-                mensagemBemVindo,
-                style: const TextStyle(
-                  color: Colors.white,
-                ),
+            boxShadow: [
+              BoxShadow(
+                color: primaryColor.withOpacity(0.2),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
-              subtitle: const Text(
-                'Sistema',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 11,
-                ),
-              ),
-              leading: Column(
+            ],
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              child: Row(
                 children: [
-                  Flexible(
-                    flex: 2,
-                    child: MaterialButton(
-                      padding: EdgeInsets.zero,
-                      child: Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.person,
-                          size: 40,
-                          color: primaryColor,
-                        ),
+                  // Avatar minimalista
+                  Container(
+                    width: 45,
+                    height: 45,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.2),
+                        width: 1.5,
                       ),
-                      onPressed: () {},
+                    ),
+                    child: Icon(
+                      Icons.person_outline,
+                      size: 22,
+                      color: Colors.white,
                     ),
                   ),
-                  const Flexible(
-                    child: Text(
-                      'Usuário',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                      ),
+                  const SizedBox(width: 12),
+
+                  // Informações do usuário - mais compactas
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Olá, ${loginUsuario.isNotEmpty ? loginUsuario : 'Visitante'}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            height: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.business,
+                              size: 14,
+                              color: Colors.white.withOpacity(0.8),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'SIS',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.8),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
+                  ),
+
+                  // Ações rápidas
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {},
+                        icon: Icon(
+                          Icons.notifications_outlined,
+                          color: Colors.white.withOpacity(0.8),
+                          size: 22,
+                        ),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        onPressed: () {},
+                        icon: Icon(
+                          Icons.more_vert,
+                          color: Colors.white.withOpacity(0.8),
+                          size: 22,
+                        ),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -131,42 +252,61 @@ class _TrocarContaWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Material(
-        elevation: 10,
-        borderRadius: BorderRadius.circular(3),
-        child: Padding(
-          padding: const EdgeInsets.only(left: 15, right: 15, top: 0),
-          child: Column(
-            children: [
-              _LogoWidget(),
-              const Divider(
-                height: 4,
-                color: accentColor,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            _LogoWidget(),
+            const SizedBox(height: 20),
+            Container(
+              width: double.infinity,
+              height: 50,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [primaryColor, primaryColor.withOpacity(0.8)],
+                ),
+                borderRadius: BorderRadius.circular(15),
               ),
-              Container(
-                margin: const EdgeInsets.all(8),
-                child: MaterialButton(
-                  onPressed: () {},
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: [
-                      ListTile(
-                        onTap: () async {
-                          _showEncerrarSessao();
-                        },
-                        minLeadingWidth: 0,
-                        contentPadding: EdgeInsets.zero,
-                        dense: true,
-                        leading: const Icon(Icons.waving_hand_outlined),
-                        title: const Text('Sair da Conta'),
-                      ),
-                    ],
+              child: ElevatedButton(
+                onPressed: () async {
+                  _showEncerrarSessao();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
                   ),
                 ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.logout, color: Colors.white),
+                    SizedBox(width: 10),
+                    Text(
+                      'Sair da Conta',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 8),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -204,153 +344,133 @@ class _TrocarContaWidget extends StatelessWidget {
 class _LogoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Center(
-        child: Container(
-          height: 120.0,
-          width: 120.0,
-          decoration: BoxDecoration(
-            color: primaryColor.withOpacity(0.1),
-            shape: BoxShape.circle,
+    return Center(
+      child: Container(
+        height: 100.0,
+        width: 100.0,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              primaryColor.withOpacity(0.2),
+              primaryColor.withOpacity(0.1),
+            ],
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: SvgPicture.asset(
-              'assets/icons/familia_icon.svg',
-              colorFilter: ColorFilter.mode(
-                primaryColor,
-                BlendMode.srcIn,
-              ),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: primaryColor.withOpacity(0.3),
+            width: 3,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: primaryColor.withOpacity(0.2),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
             ),
-          ),
+          ],
+        ),
+        child: CircleAvatar(
+          radius: 45,
+          backgroundImage: const AssetImage('assets/icons/familia.png'),
+          backgroundColor: Colors.transparent,
         ),
       ),
     );
   }
 }
 
-class _AcoesHistoricoWidget extends StatelessWidget {
+class _AcoesGridWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(4.0),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: CardAcaoWidget(
-                  title: 'Pesquisar Pessoa',
-                  color: Colors.grey,
-                  onTap: () {
-                    Get.toNamed('/pesquisar-pessoa');
-                  },
-                  imagem:
-                      Icon(Icons.person_search, size: 30, color: primaryColor),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: CardAcaoWidget(
-                  title: 'Ação 2',
-                  color: Colors.grey,
-                  onTap: () {
-                    // Navegar para posts
-                  },
-                  imagem: Icon(Icons.article, size: 30, color: primaryColor),
-                ),
-              ),
-            ],
+    final List<Map<String, dynamic>> acoes = [
+      {
+        'title': 'Pesquisar Pessoa',
+        'icon': Icons.person_search,
+        'color': primaryColor,
+        'onTap': () => Get.toNamed('/pesquisar-pessoa'),
+        'showBadge': false,
+      },
+      {
+        'title': 'Relatórios',
+        'icon': Icons.article,
+        'color': Colors.blue,
+        'onTap': () {},
+        'showBadge': false,
+      },
+      {
+        'title': 'Famílias',
+        'icon': Icons.people,
+        'color': Colors.green,
+        'onTap': () {},
+        'showBadge': false,
+      },
+      {
+        'title': 'Mensagens',
+        'icon': Icons.message,
+        'color': Colors.orange,
+        'onTap': () {},
+        'showBadge': true,
+      },
+      {
+        'title': 'Calendário',
+        'icon': Icons.calendar_today,
+        'color': Colors.purple,
+        'onTap': () {},
+        'showBadge': false,
+      },
+      {
+        'title': 'Perfil',
+        'icon': Icons.person,
+        'color': Colors.teal,
+        'onTap': () {},
+        'showBadge': false,
+      },
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20),
+          child: Text(
+            'Ações Disponíveis',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Colors.grey.shade800,
+            ),
           ),
-        ],
-      ),
+        ),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 15,
+            mainAxisSpacing: 15,
+            childAspectRatio: 1.0,
+          ),
+          itemCount: acoes.length,
+          itemBuilder: (context, index) {
+            final acao = acoes[index];
+            return CardAcaoWidget(
+              title: acao['title'],
+              color: acao['color'],
+              onTap: acao['onTap'],
+              showBadge: acao['showBadge'],
+              imagem: Icon(
+                acao['icon'],
+                size: 28,
+                color: Colors.white,
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 }
 
-class _AcoesWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(4.0),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: CardAcaoWidget(
-                  title: 'Ação 3',
-                  color: Colors.grey,
-                  onTap: () {
-                    // Navegar para grupos
-                  },
-                  imagem: Icon(Icons.people, size: 40, color: primaryColor),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: CardAcaoWidget(
-                  title: 'Mensagens',
-                  color: Colors.grey,
-                  onTap: () {
-                    // Navegar para mensagens
-                  },
-                  imagem: Icon(Icons.message, size: 30, color: primaryColor),
-                  showBadge: false,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _OutrasAcoesWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(4.0),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: CardAcaoWidget(
-                  title: 'Ação 4',
-                  color: Colors.grey,
-                  onTap: () {
-                    // Navegar para eventos
-                  },
-                  imagem:
-                      Icon(Icons.calendar_today, size: 40, color: primaryColor),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: CardAcaoWidget(
-                  title: 'Perfil',
-                  color: Colors.grey,
-                  onTap: () {
-                    // Navegar para perfil
-                  },
-                  imagem: Icon(Icons.person, size: 50, color: primaryColor),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class CardAcaoWidget extends StatelessWidget {
+class CardAcaoWidget extends StatefulWidget {
   final String? title;
   final String? subTitle;
   final Widget? imagem;
@@ -369,41 +489,136 @@ class CardAcaoWidget extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<CardAcaoWidget> createState() => _CardAcaoWidgetState();
+}
+
+class _CardAcaoWidgetState extends State<CardAcaoWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    _animationController.forward();
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    _animationController.reverse();
+  }
+
+  void _onTapCancel() {
+    _animationController.reverse();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Material(
-      elevation: 10.0,
-      borderRadius: const BorderRadius.all(Radius.circular(4.0)),
-      child: InkWell(
-        child: Container(
-          margin: const EdgeInsets.all(8),
-          child: Column(
-            children: [
-              badges.Badge(
-                showBadge: showBadge == true,
-                badgeContent: const Text('0'),
-                badgeColor: Colors.white,
-                child: Container(
-                  padding: const EdgeInsets.only(top: 10),
-                  width: 60,
-                  height: 60,
-                  child: imagem!,
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: GestureDetector(
+            onTapDown: _onTapDown,
+            onTapUp: _onTapUp,
+            onTapCancel: _onTapCancel,
+            onTap: () => widget.onTap?.call(),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white,
+                    Colors.grey.shade50,
+                  ],
                 ),
-              ),
-              const SizedBox(height: 4),
-              Container(
-                child: Text(
-                  title!,
-                  style: const TextStyle(
-                    fontSize: 12,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
                   ),
+                  BoxShadow(
+                    color: Colors.white.withOpacity(0.8),
+                    blurRadius: 15,
+                    offset: const Offset(-5, -5),
+                  ),
+                ],
+                border: Border.all(
+                  color: Colors.grey.shade200,
+                  width: 1,
                 ),
               ),
-              const SizedBox(height: 10),
-            ],
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 45,
+                    height: 45,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          widget.color ?? primaryColor,
+                          (widget.color ?? primaryColor).withOpacity(0.7),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              (widget.color ?? primaryColor).withOpacity(0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: badges.Badge(
+                      showBadge: widget.showBadge == true,
+                      badgeContent:
+                          const Text('0', style: TextStyle(fontSize: 10)),
+                      badgeColor: Colors.red,
+                      position: badges.BadgePosition.topEnd(top: -5, end: -5),
+                      child: IconTheme(
+                        data: const IconThemeData(size: 24),
+                        child: widget.imagem!,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    widget.title!,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey.shade800,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-        onTap: () => {onTap!()},
-      ),
+        );
+      },
     );
   }
 }
@@ -418,43 +633,67 @@ class _AppVersionWidget extends StatelessWidget {
             ? '${snapshot.data!.version}+${snapshot.data!.buildNumber}'
             : '1.0.0+1';
 
-        return Center(
-          child: Container(
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 15,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: backgroundColor,
+                    Text(
+                      'Sobre o App',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade800,
                       ),
-                      onPressed: () {
-                        // Navegar para sobre
-                      },
-                      child: Icon(
-                        Icons.info_outline,
-                        size: 50,
-                        color: primaryColor,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Versão $version',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
-                Text('Versão $version'),
-              ],
-            ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [primaryColor, primaryColor.withOpacity(0.8)],
+                  ),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: IconButton(
+                  onPressed: () {
+                    // Navegar para sobre
+                  },
+                  icon: const Icon(
+                    Icons.info_outline,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },
     );
   }
 }
-
-
-
-
-
-
-
-

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Permite cleartext (HTTP) para desenvolvimento -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">unseraphic-nonselective-shantae.ngrok-free.dev</domain>
+    </domain-config>
+
+    <!-- Configuração HTTPS padrão para outros domínios -->
+    <base-config cleartextTrafficPermitted="false" />
+</network-security-config>
+
+
+
