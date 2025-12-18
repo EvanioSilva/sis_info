@@ -13,7 +13,7 @@ import 'package:sis_flutter/utils/utils.dart';
 
 class DetalhesPessoaController extends GetxController {
   final AppController appController = Get.find<AppController>();
-  final PessoaService pessoaService = PessoaService();
+  final PessoaService pessoaService = Get.find<PessoaService>();
 
   final Pessoa pessoa;
 

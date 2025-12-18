@@ -100,7 +100,38 @@ class LoginPage extends StatelessWidget {
                         );
                       },
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 20),
+
+                    // Botão de teste de conectividade
+                    GetBuilder<LoginController>(
+                      id: 'connectivity',
+                      builder: (controller) {
+                        return SizedBox(
+                          width: double.infinity,
+                          height: 40,
+                          child: controller.isWaiting
+                              ? Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.orange,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : TextButton.icon(
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.orange,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      side: const BorderSide(color: Colors.orange),
+                                    ),
+                                  ),
+                                  onPressed: controller.testarConectividade,
+                                  icon: const Icon(Icons.wifi_tethering, size: 18),
+                                  label: const Text('Testar Conexão'),
+                                ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 20),
 
                     // Botão de login
                     SizedBox(

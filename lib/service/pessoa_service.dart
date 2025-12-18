@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
 import 'package:sis_flutter/model/pessoa_model.dart';
 import 'package:sis_flutter/model/vw_familia_responsavel_nova_renda_model.dart';
 import 'package:sis_flutter/model/vw_familia_pessoa_nova_renda_model.dart';
@@ -8,8 +6,47 @@ import 'package:sis_flutter/model/vw_pessoa_programa_nova_renda_model.dart';
 import 'package:sis_flutter/model/vw_nova_renda_mes_model.dart';
 import 'package:sis_flutter/model/vw_historico_familia_pessoa_model.dart';
 
-class PessoaService extends GetxService {
-  static const String baseUrl = 'https://unseraphic-nonselective-shantae.ngrok-free.dev/api/sis';
+class PessoaService extends GetConnect {
+  @override
+  void onInit() {
+    super.onInit();
+    baseUrl = 'https://unseraphic-nonselective-shantae.ngrok-free.dev/api/sis';
+
+    // Configurações de timeout e headers padrão
+    timeout = const Duration(seconds: 30);
+    httpClient.addRequestModifier<dynamic>((request) {
+      request.headers['Content-Type'] = 'application/json';
+      request.headers['Accept'] = 'application/json';
+      return request;
+    });
+  }
+
+  /// Trata resposta da API de forma segura
+  dynamic _handleResponse(Response response, String operationName) {
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      final statusCode = response.statusCode ?? 'desconhecido';
+      final body = response.body?.toString() ?? 'sem resposta';
+      throw Exception('Erro ao $operationName: $statusCode - $body');
+    }
+  }
+
+  /// Trata exceções de rede
+  Exception _handleNetworkError(dynamic error, String operationName) {
+    if (error.toString().contains('SocketException') ||
+        error.toString().contains('TimeoutException') ||
+        error.toString().contains('Network is unreachable')) {
+      return Exception(
+          'Erro de conexão: Verifique sua internet e tente novamente');
+    } else if (error.toString().contains('Connection refused') ||
+        error.toString().contains('Connection reset')) {
+      return Exception(
+          'Erro de servidor: Serviço temporariamente indisponível');
+    } else {
+      return Exception('Erro ao $operationName: ${error.toString()}');
+    }
+  }
 
   /// Pesquisa pessoas na API
   /// Todos os parâmetros são opcionais
@@ -24,7 +61,7 @@ class PessoaService extends GetxService {
     String? tipoResponsavel,
   }) async {
     try {
-      // Construir a URL com query parameters
+      // Construir query parameters
       final Map<String, String> queryParams = {};
 
       if (codFamiliar != null && codFamiliar.isNotEmpty) {
@@ -52,178 +89,86 @@ class PessoaService extends GetxService {
         queryParams['tipoResponsavel'] = tipoResponsavel;
       }
 
-      final uri = Uri.parse('$baseUrl/PesquisarPessoas').replace(
-        queryParameters: queryParams.isEmpty ? null : queryParams,
-      );
-
-      print(uri);
-
-      // Fazer a requisição GET
-      final response = await http.get(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      ).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () {
-          throw Exception('Tempo de requisição excedido');
-        },
-      );
-
-      // Verificar se a requisição foi bem-sucedida
-      if (response.statusCode == 200) {
-        // Decodificar o JSON
-        final List<dynamic> jsonList = json.decode(response.body);
-
-        // Converter para lista de Pessoa
-        final List<Pessoa> pessoas = jsonList
-            .map((json) => Pessoa.fromMap(json as Map<String, dynamic>))
-            .toList();
-
-        return pessoas;
-      } else {
-        throw Exception(
-            'Erro ao buscar pessoas: ${response.statusCode} - ${response.body}');
-      }
+      final response = await get('/PesquisarPessoas', query: queryParams);
+      final jsonList =
+          _handleResponse(response, 'buscar pessoas') as List<dynamic>;
+      return jsonList
+          .map((json) => Pessoa.fromMap(json as Map<String, dynamic>))
+          .toList();
     } catch (e) {
-      throw Exception('Erro ao pesquisar pessoas: ${e.toString()}');
+      throw _handleNetworkError(e, 'pesquisar pessoas');
     }
   }
 
   /// Pesquisa dados de família responsável nova renda
-  Future<List<VwFamiliaResponsavelNovaRendaModel>> pesquisarVwFamiliaResponsavelNovaRenda({
+  Future<List<VwFamiliaResponsavelNovaRendaModel>>
+      pesquisarVwFamiliaResponsavelNovaRenda({
     int? idfamilia,
   }) async {
     try {
       final Map<String, String> queryParams = {};
-
       if (idfamilia != null) {
         queryParams['idfamilia'] = idfamilia.toString();
       }
 
-      final uri = Uri.parse('$baseUrl/PesquisarVwFamiliaResponsavelNovaRenda').replace(
-        queryParameters: queryParams.isEmpty ? null : queryParams,
-      );
-
-      print(uri);
-
-      final response = await http.get(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      ).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () {
-          throw Exception('Tempo de requisição excedido');
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);
-        final List<VwFamiliaResponsavelNovaRendaModel> dados = jsonList
-            .map((json) => VwFamiliaResponsavelNovaRendaModel.fromJson(json as Map<String, dynamic>))
-            .toList();
-        return dados;
-      } else {
-        throw Exception(
-            'Erro ao buscar dados: ${response.statusCode} - ${response.body}');
-      }
+      final response = await get('/PesquisarVwFamiliaResponsavelNovaRenda',
+          query: queryParams);
+      final jsonList = _handleResponse(response, 'buscar família responsável')
+          as List<dynamic>;
+      return jsonList
+          .map((json) => VwFamiliaResponsavelNovaRendaModel.fromJson(
+              json as Map<String, dynamic>))
+          .toList();
     } catch (e) {
-      throw Exception('Erro ao pesquisar família responsável nova renda: ${e.toString()}');
+      throw _handleNetworkError(e, 'pesquisar família responsável nova renda');
     }
   }
 
   /// Pesquisa dados de família pessoa nova renda
-  Future<List<VwFamiliaPessoaNovaRendaModel>> pesquisarVwFamiliaPessoaNovaRenda({
+  Future<List<VwFamiliaPessoaNovaRendaModel>>
+      pesquisarVwFamiliaPessoaNovaRenda({
     int? idfamilia,
   }) async {
     try {
       final Map<String, String> queryParams = {};
-
       if (idfamilia != null) {
         queryParams['idfamilia'] = idfamilia.toString();
       }
 
-      final uri = Uri.parse('$baseUrl/PesquisarVwFamiliaPessoaNovaRenda').replace(
-        queryParameters: queryParams.isEmpty ? null : queryParams,
-      );
-
-      print(uri);
-
-      final response = await http.get(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      ).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () {
-          throw Exception('Tempo de requisição excedido');
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);
-        final List<VwFamiliaPessoaNovaRendaModel> dados = jsonList
-            .map((json) => VwFamiliaPessoaNovaRendaModel.fromJson(json as Map<String, dynamic>))
-            .toList();
-        return dados;
-      } else {
-        throw Exception(
-            'Erro ao buscar dados: ${response.statusCode} - ${response.body}');
-      }
+      final response =
+          await get('/PesquisarVwFamiliaPessoaNovaRenda', query: queryParams);
+      final jsonList =
+          _handleResponse(response, 'buscar família pessoa') as List<dynamic>;
+      return jsonList
+          .map((json) => VwFamiliaPessoaNovaRendaModel.fromJson(
+              json as Map<String, dynamic>))
+          .toList();
     } catch (e) {
-      throw Exception('Erro ao pesquisar família pessoa nova renda: ${e.toString()}');
+      throw _handleNetworkError(e, 'pesquisar família pessoa nova renda');
     }
   }
 
   /// Pesquisa dados de pessoa programa nova renda
-  Future<List<VwPessoaProgramaNovaRendaModel>> pesquisarVwPessoaProgramaNovaRenda({
+  Future<List<VwPessoaProgramaNovaRendaModel>>
+      pesquisarVwPessoaProgramaNovaRenda({
     int? idfamilia,
   }) async {
     try {
       final Map<String, String> queryParams = {};
-
       if (idfamilia != null) {
         queryParams['idfamilia'] = idfamilia.toString();
       }
 
-      final uri = Uri.parse('$baseUrl/PesquisarVwPessoaProgramaNovaRenda').replace(
-        queryParameters: queryParams.isEmpty ? null : queryParams,
-      );
-
-      print(uri);
-
-      final response = await http.get(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      ).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () {
-          throw Exception('Tempo de requisição excedido');
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);
-        final List<VwPessoaProgramaNovaRendaModel> dados = jsonList
-            .map((json) => VwPessoaProgramaNovaRendaModel.fromJson(json as Map<String, dynamic>))
-            .toList();
-        return dados;
-      } else {
-        throw Exception(
-            'Erro ao buscar dados: ${response.statusCode} - ${response.body}');
-      }
+      final response =
+          await get('/PesquisarVwPessoaProgramaNovaRenda', query: queryParams);
+      final jsonList =
+          _handleResponse(response, 'buscar pessoa programa') as List<dynamic>;
+      return jsonList
+          .map((json) => VwPessoaProgramaNovaRendaModel.fromJson(
+              json as Map<String, dynamic>))
+          .toList();
     } catch (e) {
-      throw Exception('Erro ao pesquisar pessoa programa nova renda: ${e.toString()}');
+      throw _handleNetworkError(e, 'pesquisar pessoa programa nova renda');
     }
   }
 
@@ -233,87 +178,44 @@ class PessoaService extends GetxService {
   }) async {
     try {
       final Map<String, String> queryParams = {};
-
       if (idfamilia != null) {
         queryParams['idfamilia'] = idfamilia.toString();
       }
 
-      final uri = Uri.parse('$baseUrl/PesquisarVwNovaRendaMes').replace(
-        queryParameters: queryParams.isEmpty ? null : queryParams,
-      );
-
-      print(uri);
-
-      final response = await http.get(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      ).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () {
-          throw Exception('Tempo de requisição excedido');
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);
-        final List<VwNovaRendaMesModel> dados = jsonList
-            .map((json) => VwNovaRendaMesModel.fromJson(json as Map<String, dynamic>))
-            .toList();
-        return dados;
-      } else {
-        throw Exception(
-            'Erro ao buscar dados: ${response.statusCode} - ${response.body}');
-      }
+      final response =
+          await get('/PesquisarVwNovaRendaMes', query: queryParams);
+      final jsonList =
+          _handleResponse(response, 'buscar nova renda mês') as List<dynamic>;
+      return jsonList
+          .map((json) =>
+              VwNovaRendaMesModel.fromJson(json as Map<String, dynamic>))
+          .toList();
     } catch (e) {
-      throw Exception('Erro ao pesquisar nova renda mês: ${e.toString()}');
+      throw _handleNetworkError(e, 'pesquisar nova renda mês');
     }
   }
 
   /// Pesquisa dados de histórico família pessoa
-  Future<List<VwHistoricoFamiliaPessoaModel>> pesquisarVwHistoricoFamiliaPessoa({
+  Future<List<VwHistoricoFamiliaPessoaModel>>
+      pesquisarVwHistoricoFamiliaPessoa({
     int? idfamilia,
   }) async {
     try {
       final Map<String, String> queryParams = {};
-
       if (idfamilia != null) {
         queryParams['idfamilia'] = idfamilia.toString();
       }
 
-      final uri = Uri.parse('$baseUrl/PesquisarVwHistoricoFamiliaPessoa').replace(
-        queryParameters: queryParams.isEmpty ? null : queryParams,
-      );
-
-      print(uri);
-
-      final response = await http.get(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      ).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () {
-          throw Exception('Tempo de requisição excedido');
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);
-        final List<VwHistoricoFamiliaPessoaModel> dados = jsonList
-            .map((json) => VwHistoricoFamiliaPessoaModel.fromJson(json as Map<String, dynamic>))
-            .toList();
-        return dados;
-      } else {
-        throw Exception(
-            'Erro ao buscar dados: ${response.statusCode} - ${response.body}');
-      }
+      final response =
+          await get('/PesquisarVwHistoricoFamiliaPessoa', query: queryParams);
+      final jsonList = _handleResponse(response, 'buscar histórico família')
+          as List<dynamic>;
+      return jsonList
+          .map((json) => VwHistoricoFamiliaPessoaModel.fromJson(
+              json as Map<String, dynamic>))
+          .toList();
     } catch (e) {
-      throw Exception('Erro ao pesquisar histórico família pessoa: ${e.toString()}');
+      throw _handleNetworkError(e, 'pesquisar histórico família pessoa');
     }
   }
 }

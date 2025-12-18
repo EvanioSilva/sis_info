@@ -26,6 +26,34 @@ class LoginController extends GetxController {
     update(['password']);
   }
 
+  Future<void> testarConectividade() async {
+    isWaiting = true;
+    update(['connectivity']);
+
+    try {
+      final conectado = await usuarioService.testarConectividade();
+
+      if (conectado) {
+        appController.showInfo('Conectividade OK! Servidor respondendo.');
+      } else {
+        appController.showSnackbar(
+          'Erro de Conexão',
+          'Não foi possível conectar ao servidor. Verifique se o servidor está rodando.',
+          cor: Colors.red,
+        );
+      }
+    } catch (e) {
+      appController.showSnackbar(
+        'Erro',
+        'Erro ao testar conectividade: ${e.toString()}',
+        cor: Colors.red,
+      );
+    } finally {
+      isWaiting = false;
+      update(['connectivity']);
+    }
+  }
+
   Future<void> fazerLogin() async {
     if (usuarioController.text.isEmpty || senhaController.text.isEmpty) {
       appController.showSnackbar(
