@@ -5,6 +5,7 @@ import 'package:sis_flutter/controller/pesquisar_pessoa_controller.dart';
 import 'package:sis_flutter/model/pessoa_model.dart';
 import 'package:sis_flutter/utils/utils.dart';
 import 'package:sis_flutter/values/colors.dart';
+import 'package:sis_flutter/utils/windows_responsive.dart';
 
 class PesquisarPessoaPage extends StatelessWidget {
   const PesquisarPessoaPage({super.key});
@@ -13,26 +14,41 @@ class PesquisarPessoaPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(PesquisarPessoaController());
 
+    final isDesktop = WindowsResponsive.isDesktopLayout(context);
+    
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: const Text('Consulta Sintética'),
+        title: Text(
+          'Consulta Sintética',
+          style: TextStyle(
+            fontSize: WindowsResponsive.getResponsiveFontSize(context, 20),
+          ),
+        ),
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         elevation: 0,
+        toolbarHeight: isDesktop ? 70 : null,
       ),
-      body: Column(
-        children: [
-          _buildSearchSection(controller),
-          Expanded(
-            child: _buildResultsSection(controller),
-          ),
-        ],
+      body: WindowsResponsive.centerContent(
+        context: context,
+        child: Column(
+          children: [
+            _buildSearchSection(context, controller),
+            Expanded(
+              child: _buildResultsSection(context, controller),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildSearchSection(PesquisarPessoaController controller) {
+  Widget _buildSearchSection(BuildContext context, PesquisarPessoaController controller) {
+    final isDesktop = WindowsResponsive.isDesktopLayout(context);
+    final padding = WindowsResponsive.getResponsivePadding(context);
+    final spacing = WindowsResponsive.getResponsiveSpacing(context);
+    
     return GetBuilder<PesquisarPessoaController>(
       id: 'pesquisa',
       builder: (_) {
@@ -41,19 +57,19 @@ class PesquisarPessoaPage extends StatelessWidget {
           curve: Curves.easeInOut,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(20),
-              bottomRight: Radius.circular(20),
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(isDesktop ? 24 : 20),
+              bottomRight: Radius.circular(isDesktop ? 24 : 20),
             ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
+                blurRadius: isDesktop ? 15 : 10,
                 offset: const Offset(0, 2),
               ),
             ],
           ),
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(isDesktop ? padding.horizontal * 0.5 : 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -62,8 +78,8 @@ class PesquisarPessoaPage extends StatelessWidget {
                   Expanded(
                     child: Text(
                       'Opções de pesquisa',
-                      style: const TextStyle(
-                        fontSize: 18,
+                      style: TextStyle(
+                        fontSize: WindowsResponsive.getResponsiveFontSize(context, 18),
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                       ),
@@ -77,6 +93,7 @@ class PesquisarPessoaPage extends StatelessWidget {
                       child: Icon(
                         Icons.keyboard_arrow_up,
                         color: Colors.grey[700],
+                        size: isDesktop ? 32 : 24,
                       ),
                     ),
                     tooltip: controller.pesquisaExpandida
@@ -90,13 +107,13 @@ class PesquisarPessoaPage extends StatelessWidget {
                 firstChild: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const SizedBox(height: 16),
+                    SizedBox(height: spacing),
                     GetBuilder<PesquisarPessoaController>(
                       id: 'tipo_pesquisa',
                       builder: (_) {
                         return Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
+                          spacing: isDesktop ? 12 : 8,
+                          runSpacing: isDesktop ? 12 : 8,
                           children: [
                             _buildFilterChip(
                               label: 'Domicilio',
@@ -131,19 +148,22 @@ class PesquisarPessoaPage extends StatelessWidget {
                         );
                       },
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: spacing),
                     GetBuilder<PesquisarPessoaController>(
                       id: 'checkbox_programa',
                       builder: (_) {
                         return Container(
                           decoration: BoxDecoration(
                             color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(isDesktop ? 12 : 8),
                           ),
                           child: CheckboxListTile(
                             title: Text(
                               'Somente famílias/Pessoas no programa',
-                              style: TextStyle(color: Colors.grey[800]),
+                              style: TextStyle(
+                                color: Colors.grey[800],
+                                fontSize: WindowsResponsive.getResponsiveFontSize(context, 14),
+                              ),
                             ),
                             value: controller.somentePrograma,
                             onChanged: controller.toggleSomentePrograma,
@@ -154,7 +174,7 @@ class PesquisarPessoaPage extends StatelessWidget {
                         );
                       },
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: spacing),
                   ],
                 ),
                 secondChild: const SizedBox.shrink(),
@@ -176,26 +196,33 @@ class PesquisarPessoaPage extends StatelessWidget {
                 ),
                 child: TextField(
                   controller: controller.pesquisaController,
+                  style: TextStyle(
+                    fontSize: WindowsResponsive.getResponsiveFontSize(context, 16),
+                  ),
                   decoration: InputDecoration(
                     hintText: 'Digite o valor para pesquisa',
-                    prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: Colors.grey[600],
+                      size: isDesktop ? 28 : 24,
+                    ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(isDesktop ? 16 : 12),
                       borderSide: BorderSide(color: Colors.grey[300]!),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(isDesktop ? 16 : 12),
                       borderSide: BorderSide(color: Colors.grey[300]!),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(isDesktop ? 16 : 12),
                       borderSide: BorderSide(color: primaryColor, width: 2),
                     ),
                     filled: true,
                     fillColor: Colors.grey[50],
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 16,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: isDesktop ? 24 : 20,
+                      vertical: isDesktop ? 20 : 16,
                     ),
                   ),
                   textCapitalization: TextCapitalization.characters,
@@ -203,7 +230,7 @@ class PesquisarPessoaPage extends StatelessWidget {
                   enabled: !controller.isWaiting,
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: spacing),
               Row(
                 children: [
                   Expanded(
@@ -213,46 +240,48 @@ class PesquisarPessoaPage extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryColor,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: EdgeInsets.symmetric(
+                          vertical: isDesktop ? 20 : 16,
+                        ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(isDesktop ? 16 : 12),
                         ),
                         elevation: 2,
                       ),
                       icon: controller.isWaiting
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
+                          ? SizedBox(
+                              width: isDesktop ? 24 : 20,
+                              height: isDesktop ? 24 : 20,
+                              child: const CircularProgressIndicator(
                                 strokeWidth: 2,
                                 valueColor:
                                     AlwaysStoppedAnimation<Color>(Colors.white),
                               ),
                             )
-                          : const Icon(Icons.search),
-                      label: const Text(
+                          : Icon(Icons.search, size: isDesktop ? 24 : 20),
+                      label: Text(
                         'Localizar',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          fontSize: WindowsResponsive.getResponsiveFontSize(context, 16),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: isDesktop ? 16 : 12),
                   ElevatedButton(
                     onPressed:
                         controller.isWaiting ? null : controller.limparPesquisa,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey[200],
                       foregroundColor: Colors.grey[800],
-                      padding: const EdgeInsets.all(16),
+                      padding: EdgeInsets.all(isDesktop ? 20 : 16),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(isDesktop ? 16 : 12),
                       ),
                       elevation: 0,
                     ),
-                    child: const Icon(Icons.clear),
+                    child: Icon(Icons.clear, size: isDesktop ? 24 : 20),
                   ),
                 ],
               ),
@@ -298,7 +327,7 @@ class PesquisarPessoaPage extends StatelessWidget {
     );
   }
 
-  Widget _buildResultsSection(PesquisarPessoaController controller) {
+  Widget _buildResultsSection(BuildContext context, PesquisarPessoaController controller) {
     return GetBuilder<PesquisarPessoaController>(
       id: 'resultado',
       builder: (_) {
@@ -354,12 +383,38 @@ class PesquisarPessoaPage extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: controller.pessoasEncontradas.length,
-                itemBuilder: (context, index) {
-                  final pessoa = controller.pessoasEncontradas[index];
-                  return _buildPersonCard(pessoa, index);
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isDesktop = WindowsResponsive.isDesktopLayout(context);
+                  final padding = WindowsResponsive.getResponsivePadding(context);
+                  
+                  if (isDesktop && constraints.maxWidth > 1200) {
+                    // Layout em grid para telas grandes
+                    return GridView.builder(
+                      padding: EdgeInsets.symmetric(horizontal: padding.horizontal * 0.5),
+                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 600,
+                        crossAxisSpacing: 20,
+                        mainAxisSpacing: 20,
+                        childAspectRatio: 1.2,
+                      ),
+                      itemCount: controller.pessoasEncontradas.length,
+                      itemBuilder: (context, index) {
+                        final pessoa = controller.pessoasEncontradas[index];
+                        return _buildPersonCard(context, pessoa, index);
+                      },
+                    );
+                  }
+                  
+                  // Layout em lista para telas menores
+                  return ListView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: isDesktop ? padding.horizontal * 0.5 : 16),
+                    itemCount: controller.pessoasEncontradas.length,
+                    itemBuilder: (context, index) {
+                      final pessoa = controller.pessoasEncontradas[index];
+                      return _buildPersonCard(context, pessoa, index);
+                    },
+                  );
                 },
               ),
             ),
@@ -369,16 +424,18 @@ class PesquisarPessoaPage extends StatelessWidget {
     );
   }
 
-  Widget _buildPersonCard(Pessoa pessoa, int index) {
+  Widget _buildPersonCard(BuildContext context, Pessoa pessoa, int index) {
+    final isDesktop = WindowsResponsive.isDesktopLayout(context);
+    
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: isDesktop ? 16 : 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(isDesktop ? 20 : 16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
-            blurRadius: 10,
+            blurRadius: isDesktop ? 15 : 10,
             offset: const Offset(0, 2),
           ),
         ],
@@ -386,20 +443,20 @@ class PesquisarPessoaPage extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(isDesktop ? 20 : 16),
           onTap: () {
             // Pode adicionar ação ao tocar no card
           },
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(isDesktop ? 24 : 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
                     Container(
-                      width: 48,
-                      height: 48,
+                      width: isDesktop ? 60 : 48,
+                      height: isDesktop ? 60 : 48,
                       decoration: BoxDecoration(
                         color: Colors.grey[200],
                         shape: BoxShape.circle,
@@ -407,18 +464,18 @@ class PesquisarPessoaPage extends StatelessWidget {
                       child: Icon(
                         Icons.person,
                         color: Colors.grey[700],
-                        size: 28,
+                        size: isDesktop ? 34 : 28,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: isDesktop ? 16 : 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             pessoa.nomPessoa ?? 'Nome não informado',
-                            style: const TextStyle(
-                              fontSize: 18,
+                            style: TextStyle(
+                              fontSize: WindowsResponsive.getResponsiveFontSize(context, 18),
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
                             ),
@@ -429,7 +486,7 @@ class PesquisarPessoaPage extends StatelessWidget {
                             Text(
                               'Ordem: ${pessoa.numOrdemPessoa}',
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: WindowsResponsive.getResponsiveFontSize(context, 12),
                                 color: Colors.grey[600],
                               ),
                             ),
@@ -457,12 +514,12 @@ class PesquisarPessoaPage extends StatelessWidget {
                       ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: isDesktop ? 20 : 16),
                 const Divider(height: 1),
-                const SizedBox(height: 12),
+                SizedBox(height: isDesktop ? 16 : 12),
                 Wrap(
-                  spacing: 16,
-                  runSpacing: 12,
+                  spacing: isDesktop ? 20 : 16,
+                  runSpacing: isDesktop ? 16 : 12,
                   children: [
                     if (pessoa.dtaNascPessoa != null)
                       _buildInfoItem(
@@ -529,18 +586,20 @@ class PesquisarPessoaPage extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: EdgeInsets.symmetric(
+                        vertical: isDesktop ? 16 : 12,
+                      ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(isDesktop ? 16 : 12),
                       ),
                       elevation: 2,
                     ),
-                    icon: const Icon(Icons.visibility, size: 20),
-                    label: const Text(
+                    icon: Icon(Icons.visibility, size: isDesktop ? 24 : 20),
+                    label: Text(
                       'Ver Detalhes',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 15,
+                        fontSize: WindowsResponsive.getResponsiveFontSize(context, 15),
                       ),
                     ),
                   ),

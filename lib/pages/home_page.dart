@@ -4,6 +4,7 @@ import 'package:badges/badges.dart' as badges;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sis_flutter/values/colors.dart';
 import 'package:sis_flutter/app_controller.dart';
+import 'package:sis_flutter/utils/windows_responsive.dart';
 
 class _FadeInAnimation extends StatefulWidget {
   final Widget child;
@@ -73,49 +74,58 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final padding = WindowsResponsive.getResponsivePadding(context);
+    final spacing = WindowsResponsive.getResponsiveSpacing(context);
+
     return Scaffold(
       backgroundColor: backgroundColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            children: [
-              _LoggedBarWidget(),
-              Container(
-                decoration: BoxDecoration(
-                  color: backgroundColor,
+        child: WindowsResponsive.centerContent(
+          context: context,
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              children: [
+                _LoggedBarWidget(),
+                Container(
+                  decoration: BoxDecoration(
+                    color: backgroundColor,
+                  ),
+                  child: Column(
+                    children: [
+                      SizedBox(height: spacing),
+                      _FadeInAnimation(
+                        delay: const Duration(milliseconds: 200),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: padding.horizontal),
+                          child: _TrocarContaWidget(),
+                        ),
+                      ),
+                      SizedBox(height: spacing),
+                      _FadeInAnimation(
+                        delay: const Duration(milliseconds: 400),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: padding.horizontal),
+                          child: _AcoesGridWidget(),
+                        ),
+                      ),
+                      SizedBox(height: spacing),
+                      _FadeInAnimation(
+                        delay: const Duration(milliseconds: 600),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: padding.horizontal),
+                          child: _AppVersionWidget(),
+                        ),
+                      ),
+                      SizedBox(height: spacing),
+                    ],
+                  ),
                 ),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 20),
-                    _FadeInAnimation(
-                      delay: const Duration(milliseconds: 200),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: _TrocarContaWidget(),
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                    _FadeInAnimation(
-                      delay: const Duration(milliseconds: 400),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: _AcoesGridWidget(),
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                    _FadeInAnimation(
-                      delay: const Duration(milliseconds: 600),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: _AppVersionWidget(),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -126,12 +136,16 @@ class HomePage extends StatelessWidget {
 class _LoggedBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final isDesktop = WindowsResponsive.isDesktopLayout(context);
+    final padding = WindowsResponsive.getResponsivePadding(context);
+    final fontSize = WindowsResponsive.getResponsiveFontSize(context, 16);
+
     return GetBuilder<AppController>(
       builder: (controller) {
         final loginUsuario = controller.usuarioAutenticado?.login ?? '';
 
         return Container(
-          height: 110,
+          height: isDesktop ? 130 : 110,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -151,13 +165,15 @@ class _LoggedBarWidget extends StatelessWidget {
           ),
           child: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: EdgeInsets.symmetric(
+                  horizontal: padding.horizontal,
+                  vertical: isDesktop ? 20 : 12),
               child: Row(
                 children: [
                   // Avatar minimalista
                   Container(
-                    width: 45,
-                    height: 45,
+                    width: isDesktop ? 60 : 45,
+                    height: isDesktop ? 60 : 45,
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.15),
                       shape: BoxShape.circle,
@@ -168,11 +184,11 @@ class _LoggedBarWidget extends StatelessWidget {
                     ),
                     child: Icon(
                       Icons.person_outline,
-                      size: 22,
+                      size: isDesktop ? 28 : 22,
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: isDesktop ? 16 : 12),
 
                   // Informações do usuário - mais compactas
                   Expanded(
@@ -182,27 +198,27 @@ class _LoggedBarWidget extends StatelessWidget {
                       children: [
                         Text(
                           'Olá, ${loginUsuario.isNotEmpty ? loginUsuario : 'Visitante'}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 16,
+                            fontSize: fontSize,
                             fontWeight: FontWeight.w500,
                             height: 1.2,
                           ),
                         ),
-                        const SizedBox(height: 2),
+                        SizedBox(height: isDesktop ? 4 : 2),
                         Row(
                           children: [
                             Icon(
                               Icons.business,
-                              size: 14,
+                              size: isDesktop ? 16 : 14,
                               color: Colors.white.withOpacity(0.8),
                             ),
-                            const SizedBox(width: 4),
+                            SizedBox(width: isDesktop ? 6 : 4),
                             Text(
                               'SIS',
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.8),
-                                fontSize: 12,
+                                fontSize: isDesktop ? 14 : 12,
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
@@ -220,18 +236,18 @@ class _LoggedBarWidget extends StatelessWidget {
                         icon: Icon(
                           Icons.notifications_outlined,
                           color: Colors.white.withOpacity(0.8),
-                          size: 22,
+                          size: isDesktop ? 26 : 22,
                         ),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: isDesktop ? 12 : 8),
                       IconButton(
                         onPressed: () {},
                         icon: Icon(
                           Icons.more_vert,
                           color: Colors.white.withOpacity(0.8),
-                          size: 22,
+                          size: isDesktop ? 26 : 22,
                         ),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
@@ -251,32 +267,36 @@ class _LoggedBarWidget extends StatelessWidget {
 class _TrocarContaWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final isDesktop = WindowsResponsive.isDesktopLayout(context);
+    final padding = WindowsResponsive.getResponsivePadding(context);
+    final spacing = WindowsResponsive.getResponsiveSpacing(context);
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(isDesktop ? 24 : 20),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 20,
+            blurRadius: isDesktop ? 25 : 20,
             offset: const Offset(0, 10),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(isDesktop ? padding.horizontal * 0.5 : 20),
         child: Column(
           children: [
             _LogoWidget(),
-            const SizedBox(height: 20),
+            SizedBox(height: spacing),
             Container(
               width: double.infinity,
-              height: 50,
+              height: isDesktop ? 60 : 50,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [primaryColor, primaryColor.withOpacity(0.8)],
                 ),
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(isDesktop ? 18 : 15),
               ),
               child: ElevatedButton(
                 onPressed: () async {
@@ -286,19 +306,21 @@ class _TrocarContaWidget extends StatelessWidget {
                   backgroundColor: Colors.transparent,
                   shadowColor: Colors.transparent,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(isDesktop ? 18 : 15),
                   ),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.logout, color: Colors.white),
-                    SizedBox(width: 10),
+                    Icon(Icons.logout,
+                        color: Colors.white, size: isDesktop ? 24 : 20),
+                    SizedBox(width: isDesktop ? 12 : 10),
                     Text(
                       'Sair da Conta',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: WindowsResponsive.getResponsiveFontSize(
+                            context, 16),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -344,10 +366,13 @@ class _TrocarContaWidget extends StatelessWidget {
 class _LogoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final isDesktop = WindowsResponsive.isDesktopLayout(context);
+    final size = isDesktop ? 140.0 : 100.0;
+
     return Center(
       child: Container(
-        height: 100.0,
-        width: 100.0,
+        height: size,
+        width: size,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -358,18 +383,18 @@ class _LogoWidget extends StatelessWidget {
           shape: BoxShape.circle,
           border: Border.all(
             color: primaryColor.withOpacity(0.3),
-            width: 3,
+            width: isDesktop ? 4 : 3,
           ),
           boxShadow: [
             BoxShadow(
               color: primaryColor.withOpacity(0.2),
-              blurRadius: 15,
+              blurRadius: isDesktop ? 20 : 15,
               offset: const Offset(0, 5),
             ),
           ],
         ),
         child: CircleAvatar(
-          radius: 45,
+          radius: isDesktop ? 65 : 45,
           backgroundImage: const AssetImage('assets/icons/familia.png'),
           backgroundColor: Colors.transparent,
         ),
@@ -430,38 +455,47 @@ class _AcoesGridWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(bottom: 20),
+          padding: EdgeInsets.only(
+              bottom: WindowsResponsive.getResponsiveSpacing(context)),
           child: Text(
             'Ações Disponíveis',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: WindowsResponsive.getResponsiveFontSize(context, 20),
               fontWeight: FontWeight.w700,
               color: Colors.grey.shade800,
             ),
           ),
         ),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 15,
-            mainAxisSpacing: 15,
-            childAspectRatio: 1.0,
-          ),
-          itemCount: acoes.length,
-          itemBuilder: (context, index) {
-            final acao = acoes[index];
-            return CardAcaoWidget(
-              title: acao['title'],
-              color: acao['color'],
-              onTap: acao['onTap'],
-              showBadge: acao['showBadge'],
-              imagem: Icon(
-                acao['icon'],
-                size: 28,
-                color: Colors.white,
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final crossAxisCount =
+                WindowsResponsive.getGridCrossAxisCount(context);
+            final spacing = WindowsResponsive.getResponsiveSpacing(context);
+
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: spacing,
+                mainAxisSpacing: spacing,
+                childAspectRatio: 1.0,
               ),
+              itemCount: acoes.length,
+              itemBuilder: (context, index) {
+                final acao = acoes[index];
+                return CardAcaoWidget(
+                  title: acao['title'],
+                  color: acao['color'],
+                  onTap: acao['onTap'],
+                  showBadge: acao['showBadge'],
+                  imagem: Icon(
+                    acao['icon'],
+                    size: WindowsResponsive.isDesktopLayout(context) ? 32 : 28,
+                    color: Colors.white,
+                  ),
+                );
+              },
             );
           },
         ),

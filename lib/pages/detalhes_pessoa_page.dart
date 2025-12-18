@@ -7,6 +7,7 @@ import 'package:sis_flutter/model/vw_familia_responsavel_nova_renda_model.dart';
 import 'package:sis_flutter/model/vw_familia_pessoa_nova_renda_model.dart';
 import 'package:sis_flutter/utils/utils.dart';
 import 'package:sis_flutter/values/colors.dart';
+import 'package:sis_flutter/utils/windows_responsive.dart';
 
 class DetalhesPessoaPage extends StatelessWidget {
   final Pessoa pessoa;
@@ -22,72 +23,87 @@ class DetalhesPessoaPage extends StatelessWidget {
 
     return GetBuilder<DetalhesPessoaController>(
       builder: (controller) {
+        final isDesktop = WindowsResponsive.isDesktopLayout(context);
+        final padding = WindowsResponsive.getResponsivePadding(context);
+        final spacing = WindowsResponsive.getResponsiveSpacing(context);
+        
         return Scaffold(
           backgroundColor: backgroundColor,
           appBar: AppBar(
-            title: const Text('Detalhes da Pessoa'),
+            title: Text(
+              'Detalhes da Pessoa',
+              style: TextStyle(
+                fontSize: WindowsResponsive.getResponsiveFontSize(context, 20),
+              ),
+            ),
             backgroundColor: primaryColor,
             foregroundColor: Colors.white,
             elevation: 0,
+            toolbarHeight: isDesktop ? 70 : null,
           ),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _buildHeaderCard(),
-                const SizedBox(height: 20),
-                _buildInfoSection('Informações Pessoais', Icons.person, [
-                  _buildInfoRow('Nome', pessoa.nomPessoa ?? 'Não informado'),
+          body: WindowsResponsive.centerContent(
+            context: context,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(padding.horizontal * 0.5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                _buildHeaderCard(context),
+                SizedBox(height: spacing),
+                _buildInfoSection(context, 'Informações Pessoais', Icons.person, [
+                  _buildInfoRow(context, 'Nome', pessoa.nomPessoa ?? 'Não informado'),
                   _buildInfoRow(
+                    context,
                     'Data de Nascimento',
                     pessoa.dtaNascPessoa != null
                         ? DateFormat('dd/MM/yyyy').format(pessoa.dtaNascPessoa!)
                         : 'Não informado',
                   ),
                   _buildInfoRow(
-                      'Mãe', pessoa.nomCompletoMaePessoa ?? 'Não informado'),
+                      context, 'Mãe', pessoa.nomCompletoMaePessoa ?? 'Não informado'),
                 ]),
-                const SizedBox(height: 20),
-                _buildInfoSection('Documentos', Icons.badge, [
+                SizedBox(height: spacing),
+                _buildInfoSection(context, 'Documentos', Icons.badge, [
                   _buildInfoRow(
-                      'CPF', Utils.ofuscarDocumento(pessoa.numCpfPessoa)),
+                      context, 'CPF', Utils.ofuscarDocumento(pessoa.numCpfPessoa)),
                   _buildInfoRow(
-                      'NIS', Utils.ofuscarDocumento(pessoa.numNisPessoaAtual)),
+                      context, 'NIS', Utils.ofuscarDocumento(pessoa.numNisPessoaAtual)),
                 ]),
-                const SizedBox(height: 20),
-                _buildInfoSection('Família', Icons.family_restroom, [
-                  _buildInfoRow('Ordem',
+                SizedBox(height: spacing),
+                _buildInfoSection(context, 'Família', Icons.family_restroom, [
+                  _buildInfoRow(context, 'Ordem',
                       pessoa.numOrdemPessoa?.toString() ?? 'Não informado'),
-                  _buildInfoRow('Código Familiar',
+                  _buildInfoRow(context, 'Código Familiar',
                       pessoa.codFamiliarFam ?? 'Não informado'),
-                  _buildInfoRow('Tipo Responsável',
+                  _buildInfoRow(context, 'Tipo Responsável',
                       pessoa.tipoResponsavel ?? 'Não informado'),
-                  _buildInfoRow('ID Família',
+                  _buildInfoRow(context, 'ID Família',
                       pessoa.idfamilia?.toString() ?? 'Não informado'),
-                  _buildInfoRow('ID Pessoa',
+                  _buildInfoRow(context, 'ID Pessoa',
                       pessoa.idpessoa?.toString() ?? 'Não informado'),
                 ]),
                 if (pessoa.temCadunico != null) ...[
-                  const SizedBox(height: 20),
-                  _buildInfoSection('Cadastro Único', Icons.assignment, [
+                  SizedBox(height: spacing),
+                  _buildInfoSection(context, 'Cadastro Único', Icons.assignment, [
                     _buildInfoRow(
+                      context,
                       'Tem CadÚnico',
                       pessoa.temCadunico == 'S' ? 'Sim' : 'Não',
                     ),
                   ]),
                 ],
-                const SizedBox(height: 20),
+                SizedBox(height: spacing),
                 _buildFamiliaResponsavelSection(controller),
-                const SizedBox(height: 20),
+                SizedBox(height: spacing),
                 _buildFamiliaPessoaSection(controller),
-                const SizedBox(height: 20),
+                SizedBox(height: spacing),
                 _buildPessoaProgramaSection(controller),
-                const SizedBox(height: 20),
+                SizedBox(height: spacing),
                 _buildNovaRendaMesSection(controller),
-                const SizedBox(height: 20),
+                SizedBox(height: spacing),
                 _buildHistoricoSection(controller),
               ],
+            ),
             ),
           ),
         );
@@ -95,10 +111,12 @@ class DetalhesPessoaPage extends StatelessWidget {
     );
   }
 
-  Widget _buildHeaderCard() {
+  Widget _buildHeaderCard(BuildContext context) {
+    final isDesktop = WindowsResponsive.isDesktopLayout(context);
+    
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 2),
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(isDesktop ? 32 : 24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -108,11 +126,11 @@ class DetalhesPessoaPage extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(isDesktop ? 28 : 24),
         boxShadow: [
           BoxShadow(
             color: primaryColor.withOpacity(0.3),
-            blurRadius: 20,
+            blurRadius: isDesktop ? 25 : 20,
             offset: const Offset(0, 8),
           ),
         ],
@@ -120,31 +138,31 @@ class DetalhesPessoaPage extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 80,
-            height: 80,
+            width: isDesktop ? 100 : 80,
+            height: isDesktop ? 100 : 80,
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.2),
               shape: BoxShape.circle,
               border: Border.all(
                 color: Colors.white.withOpacity(0.3),
-                width: 2,
+                width: isDesktop ? 3 : 2,
               ),
             ),
             child: Icon(
               Icons.person,
               color: Colors.white,
-              size: 40,
+              size: isDesktop ? 50 : 40,
             ),
           ),
-          const SizedBox(width: 20),
+          SizedBox(width: isDesktop ? 24 : 20),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   pessoa.nomPessoa ?? 'Nome não informado',
-                  style: const TextStyle(
-                    fontSize: 24,
+                  style: TextStyle(
+                    fontSize: WindowsResponsive.getResponsiveFontSize(context, 24),
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                     letterSpacing: 0.5,
@@ -152,16 +170,16 @@ class DetalhesPessoaPage extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: isDesktop ? 6 : 4),
                 if (pessoa.tipoResponsavel != null) ...[
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isDesktop ? 16 : 12,
+                      vertical: isDesktop ? 8 : 6,
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(isDesktop ? 24 : 20),
                       border: Border.all(
                         color: Colors.white.withOpacity(0.3),
                         width: 1,
@@ -169,8 +187,8 @@ class DetalhesPessoaPage extends StatelessWidget {
                     ),
                     child: Text(
                       pessoa.tipoResponsavel!,
-                      style: const TextStyle(
-                        fontSize: 12,
+                      style: TextStyle(
+                        fontSize: WindowsResponsive.getResponsiveFontSize(context, 12),
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                         letterSpacing: 0.5,
@@ -186,16 +204,18 @@ class DetalhesPessoaPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoSection(String title, IconData icon, List<Widget> children) {
+  Widget _buildInfoSection(BuildContext context, String title, IconData icon, List<Widget> children) {
+    final isDesktop = WindowsResponsive.isDesktopLayout(context);
+    
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 2),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(isDesktop ? 24 : 20),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06),
-            blurRadius: 15,
+            blurRadius: isDesktop ? 20 : 15,
             offset: const Offset(0, 4),
           ),
         ],
@@ -208,7 +228,10 @@ class DetalhesPessoaPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            padding: EdgeInsets.symmetric(
+              horizontal: isDesktop ? 28 : 20,
+              vertical: isDesktop ? 20 : 16,
+            ),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -218,27 +241,31 @@ class DetalhesPessoaPage extends StatelessWidget {
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               ),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(isDesktop ? 24 : 20),
+                topRight: Radius.circular(isDesktop ? 24 : 20),
               ),
             ),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(isDesktop ? 10 : 8),
                   decoration: BoxDecoration(
                     color: primaryColor.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(isDesktop ? 12 : 10),
                   ),
-                  child: Icon(icon, color: primaryColor, size: 18),
+                  child: Icon(
+                    icon,
+                    color: primaryColor,
+                    size: isDesktop ? 22 : 18,
+                  ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: isDesktop ? 16 : 12),
                 Expanded(
                   child: Text(
                     title,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: WindowsResponsive.getResponsiveFontSize(context, 16),
                       fontWeight: FontWeight.w600,
                       color: Colors.grey[800],
                       letterSpacing: 0.2,
@@ -248,13 +275,13 @@ class DetalhesPessoaPage extends StatelessWidget {
                 Icon(
                   Icons.keyboard_arrow_down,
                   color: Colors.grey[400],
-                  size: 20,
+                  size: isDesktop ? 24 : 20,
                 ),
               ],
             ),
           ),
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(isDesktop ? 28 : 20),
             child: Column(
               children: children,
             ),
@@ -264,13 +291,18 @@ class DetalhesPessoaPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow(BuildContext context, String label, String value) {
+    final isDesktop = WindowsResponsive.isDesktopLayout(context);
+    
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      margin: EdgeInsets.only(bottom: isDesktop ? 12 : 8),
+      padding: EdgeInsets.symmetric(
+        vertical: isDesktop ? 16 : 12,
+        horizontal: isDesktop ? 20 : 16,
+      ),
       decoration: BoxDecoration(
         color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(isDesktop ? 16 : 12),
         border: Border.all(
           color: Colors.grey[200]!,
           width: 1,
@@ -284,7 +316,7 @@ class DetalhesPessoaPage extends StatelessWidget {
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: WindowsResponsive.getResponsiveFontSize(context, 13),
                 color: Colors.grey[700],
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.3,
@@ -293,16 +325,16 @@ class DetalhesPessoaPage extends StatelessWidget {
           ),
           Container(
             width: 1,
-            height: 20,
+            height: isDesktop ? 24 : 20,
             color: Colors.grey[300],
-            margin: const EdgeInsets.symmetric(horizontal: 12),
+            margin: EdgeInsets.symmetric(horizontal: isDesktop ? 16 : 12),
           ),
           Expanded(
             flex: 3,
             child: Text(
               value,
-              style: const TextStyle(
-                fontSize: 14,
+              style: TextStyle(
+                fontSize: WindowsResponsive.getResponsiveFontSize(context, 14),
                 color: Colors.black87,
                 fontWeight: FontWeight.w500,
                 height: 1.3,
@@ -330,12 +362,13 @@ class DetalhesPessoaPage extends StatelessWidget {
         }
 
         return _buildFamiliaResponsavelDataSection(
-            ctrl.familiaResponsavelDados.first, controller);
+            Get.context!, ctrl.familiaResponsavelDados.first, controller);
       },
     );
   }
 
   Widget _buildFamiliaResponsavelDataSection(
+      BuildContext context,
       VwFamiliaResponsavelNovaRendaModel data,
       DetalhesPessoaController controller) {
     return Container(
@@ -409,6 +442,7 @@ class DetalhesPessoaPage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildModernInfoCard(
+                        context,
                         'Código Familiar',
                         data.codFamiliarFam ?? 'Não informado',
                         Icons.family_restroom,
@@ -418,6 +452,7 @@ class DetalhesPessoaPage extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildModernInfoCard(
+                        context,
                         'Estado Cadastral',
                         data.estadoCadastral ?? 'Não informado',
                         Icons.verified_user,
@@ -433,6 +468,7 @@ class DetalhesPessoaPage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildModernInfoCard(
+                        context,
                         'CPF',
                         Utils.ofuscarDocumento(data.numCpfPessoa),
                         Icons.credit_card,
@@ -442,6 +478,7 @@ class DetalhesPessoaPage extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildModernInfoCard(
+                        context,
                         'NIS',
                         Utils.ofuscarDocumento(data.numNisPessoaAtual),
                         Icons.badge,
@@ -457,6 +494,7 @@ class DetalhesPessoaPage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildModernInfoCard(
+                        context,
                         'RPC Calculada',
                         controller.formatarValor(data.vlrrenda),
                         Icons.trending_up,
@@ -466,6 +504,7 @@ class DetalhesPessoaPage extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildModernInfoCard(
+                        context,
                         'RPC Original',
                         controller.formatarValor(data.vlRendaPercaptaOriginal),
                         Icons.account_balance_wallet,
@@ -481,6 +520,7 @@ class DetalhesPessoaPage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildModernInfoCard(
+                        context,
                         'Jovem Aprendiz',
                         (data.temMenorAprendiz == 'S') ? 'Sim' : 'Não',
                         Icons.school,
@@ -490,6 +530,7 @@ class DetalhesPessoaPage extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildModernInfoCard(
+                        context,
                         'Data Entrevista',
                         controller.formatarValor(data.dtaEntrevistaFam),
                         Icons.calendar_today,
@@ -502,6 +543,7 @@ class DetalhesPessoaPage extends StatelessWidget {
 
                 // Quinta linha: Datas importantes
                 _buildModernInfoCard(
+                  context,
                   'Última Atualização',
                   controller.formatarValor(data.dtUltAtualizacao),
                   Icons.update,
@@ -517,6 +559,7 @@ class DetalhesPessoaPage extends StatelessWidget {
   }
 
   Widget _buildFamiliaPessoaDataSection(
+      BuildContext context,
       VwFamiliaPessoaNovaRendaModel data, DetalhesPessoaController controller) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 2),
@@ -589,6 +632,7 @@ class DetalhesPessoaPage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildModernInfoCard(
+                        context,
                         'Ordem',
                         data.numOrdemPessoa?.toString() ?? 'Não informado',
                         Icons.format_list_numbered,
@@ -598,6 +642,7 @@ class DetalhesPessoaPage extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildModernInfoCard(
+                        context,
                         'Estado Cadastral',
                         data.estadoCadastral ?? 'Não informado',
                         Icons.verified_user,
@@ -613,6 +658,7 @@ class DetalhesPessoaPage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildModernInfoCard(
+                        context,
                         'CPF',
                         Utils.ofuscarDocumento(data.numCpfPessoa),
                         Icons.credit_card,
@@ -622,6 +668,7 @@ class DetalhesPessoaPage extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildModernInfoCard(
+                        context,
                         'NIS',
                         Utils.ofuscarDocumento(data.numNisPessoaAtual),
                         Icons.badge,
@@ -637,6 +684,7 @@ class DetalhesPessoaPage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildModernInfoCard(
+                        context,
                         'RPC Calculada',
                         controller.formatarValor(data.vlrrenda),
                         Icons.trending_up,
@@ -646,6 +694,7 @@ class DetalhesPessoaPage extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildModernInfoCard(
+                        context,
                         'RPC Original',
                         controller.formatarValor(data.vlRendaPercaptaOriginal),
                         Icons.account_balance_wallet,
@@ -661,6 +710,7 @@ class DetalhesPessoaPage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildModernInfoCard(
+                        context,
                         'Status Cadastro',
                         data.edtStatusCadastro ?? 'Não informado',
                         Icons.assignment_turned_in,
@@ -670,6 +720,7 @@ class DetalhesPessoaPage extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildModernInfoCard(
+                        context,
                         'Jovem Aprendiz',
                         (data.temMenorAprendiz == 'S') ? 'Sim' : 'Não',
                         Icons.school,
@@ -685,6 +736,7 @@ class DetalhesPessoaPage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildModernInfoCard(
+                        context,
                         'Data Entrevista',
                         controller.formatarValor(data.dtaEntrevistaFam),
                         Icons.calendar_today,
@@ -694,6 +746,7 @@ class DetalhesPessoaPage extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildModernInfoCard(
+                        context,
                         'Última Atualização',
                         controller.formatarValor(data.dtUltAtualizacao),
                         Icons.update,
@@ -711,14 +764,16 @@ class DetalhesPessoaPage extends StatelessWidget {
   }
 
   Widget _buildModernInfoCard(
-      String label, String value, IconData icon, Color color,
+      BuildContext context, String label, String value, IconData icon, Color color,
       {bool isFullWidth = false}) {
+    final isDesktop = WindowsResponsive.isDesktopLayout(context);
+    
     return Container(
       width: isFullWidth ? double.infinity : null,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(isDesktop ? 20 : 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(isDesktop ? 20 : 16),
         border: Border.all(
           color: color.withOpacity(0.2),
           width: 1.5,
@@ -726,7 +781,7 @@ class DetalhesPessoaPage extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: color.withOpacity(0.1),
-            blurRadius: 8,
+            blurRadius: isDesktop ? 12 : 8,
             offset: const Offset(0, 2),
           ),
         ],
@@ -737,23 +792,23 @@ class DetalhesPessoaPage extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: EdgeInsets.all(isDesktop ? 8 : 6),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(isDesktop ? 10 : 8),
                 ),
                 child: Icon(
                   icon,
                   color: color,
-                  size: 16,
+                  size: isDesktop ? 20 : 16,
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: isDesktop ? 12 : 8),
               Expanded(
                 child: Text(
                   label,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: WindowsResponsive.getResponsiveFontSize(context, 12),
                     fontWeight: FontWeight.w600,
                     color: Colors.grey[600],
                     letterSpacing: 0.5,
@@ -762,11 +817,11 @@ class DetalhesPessoaPage extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: isDesktop ? 12 : 8),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 14,
+            style: TextStyle(
+              fontSize: WindowsResponsive.getResponsiveFontSize(context, 14),
               fontWeight: FontWeight.w600,
               color: Colors.black87,
               height: 1.3,
@@ -793,7 +848,7 @@ class DetalhesPessoaPage extends StatelessWidget {
         }
 
         return _buildFamiliaPessoaDataSection(
-            ctrl.familiaPessoaDados.first, controller);
+            Get.context!, ctrl.familiaPessoaDados.first, controller);
       },
     );
   }
@@ -812,10 +867,11 @@ class DetalhesPessoaPage extends StatelessWidget {
               'Nenhum programa encontrado', Icons.business_center);
         }
 
-        return _buildInfoSection('Programas Sociais', Icons.business_center, [
+        return _buildInfoSection(Get.context!, 'Programas Sociais', Icons.business_center, [
           _buildInfoRow(
-              'Total de Programas', ctrl.pessoaProgramaDados.length.toString()),
+              Get.context!, 'Total de Programas', ctrl.pessoaProgramaDados.length.toString()),
           _buildInfoRow(
+              Get.context!,
               'ID Família',
               ctrl.pessoaProgramaDados.first.idfamilia?.toString() ??
                   'Não informado'),
@@ -837,10 +893,11 @@ class DetalhesPessoaPage extends StatelessWidget {
               'Nenhum dado de renda encontrado', Icons.attach_money);
         }
 
-        return _buildInfoSection('Renda Mensal', Icons.attach_money, [
+        return _buildInfoSection(Get.context!, 'Renda Mensal', Icons.attach_money, [
           _buildInfoRow(
-              'Registros de Renda', ctrl.novaRendaMesDados.length.toString()),
+              Get.context!, 'Registros de Renda', ctrl.novaRendaMesDados.length.toString()),
           _buildInfoRow(
+              Get.context!,
               'ID Família',
               ctrl.novaRendaMesDados.first.idfamilia?.toString() ??
                   'Não informado'),
@@ -862,10 +919,11 @@ class DetalhesPessoaPage extends StatelessWidget {
               'Histórico', 'Nenhum histórico encontrado', Icons.history);
         }
 
-        return _buildInfoSection('Histórico', Icons.history, [
+        return _buildInfoSection(Get.context!, 'Histórico', Icons.history, [
           _buildInfoRow(
-              'Total de Registros', ctrl.historicoDados.length.toString()),
+              Get.context!, 'Total de Registros', ctrl.historicoDados.length.toString()),
           _buildInfoRow(
+              Get.context!,
               'ID Família',
               ctrl.historicoDados.first.idfamilia?.toString() ??
                   'Não informado'),
