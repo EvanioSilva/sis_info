@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sis_flutter/app_controller.dart';
@@ -63,11 +62,8 @@ class DetalhesPessoaController extends GetxController {
 
       update(['familia_responsavel']);
     } catch (e) {
-      appController.showSnackbar(
-        'Erro',
-        'Erro ao carregar dados da família responsável: ${e.toString()}',
-        cor: Colors.red,
-      );
+      print('❌ Erro ao carregar dados da família responsável: $e');
+      familiaResponsavelDados = [];
     } finally {
       isWaitingFamiliaResponsavel = false;
       update(['familia_responsavel']);
@@ -86,11 +82,8 @@ class DetalhesPessoaController extends GetxController {
 
       update(['familia_pessoa']);
     } catch (e) {
-      appController.showSnackbar(
-        'Erro',
-        'Erro ao carregar dados da família pessoa: ${e.toString()}',
-        cor: Colors.red,
-      );
+      print('❌ Erro ao carregar dados da família pessoa: $e');
+      familiaPessoaDados = [];
     } finally {
       isWaitingFamiliaPessoa = false;
       update(['familia_pessoa']);
@@ -109,11 +102,8 @@ class DetalhesPessoaController extends GetxController {
 
       update(['pessoa_programa']);
     } catch (e) {
-      appController.showSnackbar(
-        'Erro',
-        'Erro ao carregar dados de programas: ${e.toString()}',
-        cor: Colors.red,
-      );
+      print('❌ Erro ao carregar dados de programas: $e');
+      pessoaProgramaDados = [];
     } finally {
       isWaitingPessoaPrograma = false;
       update(['pessoa_programa']);
@@ -131,11 +121,8 @@ class DetalhesPessoaController extends GetxController {
 
       update(['nova_renda_mes']);
     } catch (e) {
-      appController.showSnackbar(
-        'Erro',
-        'Erro ao carregar dados de renda mensal: ${e.toString()}',
-        cor: Colors.red,
-      );
+      print('❌ Erro ao carregar dados de renda mensal: $e');
+      novaRendaMesDados = [];
     } finally {
       isWaitingNovaRendaMes = false;
       update(['nova_renda_mes']);
@@ -153,11 +140,8 @@ class DetalhesPessoaController extends GetxController {
 
       update(['historico']);
     } catch (e) {
-      appController.showSnackbar(
-        'Erro',
-        'Erro ao carregar dados do histórico: ${e.toString()}',
-        cor: Colors.red,
-      );
+      print('❌ Erro ao carregar dados do histórico: $e');
+      historicoDados = [];
     } finally {
       isWaitingHistorico = false;
       update(['historico']);

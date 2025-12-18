@@ -42,6 +42,7 @@ class UsuarioService extends GetConnect {
   /// Autentica um usuário na API
   /// [usuario] é o objeto Usuario com login e senha preenchidos
   /// Retorna um Usuario com o campo autenticado preenchido
+  /// Pode lançar exceção em caso de erro
   Future<Usuario> autenticar(Usuario usuario) async {
     try {
       final response = await post('/autenticar', usuario.toMap());
@@ -52,20 +53,13 @@ class UsuarioService extends GetConnect {
         // Verifica se response não é null antes de acessar propriedades
         final statusCode = response.statusCode ?? 'desconhecido';
         final body = response.body?.toString() ?? 'sem resposta';
+        print('❌ Erro ao autenticar usuário: Status $statusCode - $body');
         throw Exception('Erro ao autenticar usuário: $statusCode - $body');
       }
     } catch (e) {
-      // Trata diferentes tipos de erro
-      if (e.toString().contains('SocketException') ||
-          e.toString().contains('TimeoutException') ||
-          e.toString().contains('Network is unreachable')) {
-        throw Exception('Erro de conexão: Verifique sua internet e tente novamente');
-      } else if (e.toString().contains('Connection refused') ||
-                 e.toString().contains('Connection reset')) {
-        throw Exception('Erro de servidor: Serviço temporariamente indisponível');
-      } else {
-        throw Exception('Erro ao autenticar usuário: ${e.toString()}');
-      }
+      print('❌ Erro ao autenticar usuário: $e');
+      // Propaga a exceção para que o controller possa tratar
+      rethrow;
     }
   }
 }

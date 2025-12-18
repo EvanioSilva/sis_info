@@ -60,11 +60,9 @@ class PesquisarPessoaController extends GetxController {
 
       update(['resultado']);
     } catch (e) {
-      appController.showSnackbar(
-        'Erro',
-        'Erro ao pesquisar pessoas: ${e.toString()}',
-        cor: Colors.red,
-      );
+      print('❌ Erro ao pesquisar pessoas: $e');
+      pessoasEncontradas = [];
+      update(['resultado']);
     } finally {
       isWaiting = false;
       update(['pesquisa']);

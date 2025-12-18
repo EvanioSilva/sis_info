@@ -28,23 +28,8 @@ class PessoaService extends GetConnect {
     } else {
       final statusCode = response.statusCode ?? 'desconhecido';
       final body = response.body?.toString() ?? 'sem resposta';
+      print('❌ Erro ao $operationName: Status $statusCode - $body');
       throw Exception('Erro ao $operationName: $statusCode - $body');
-    }
-  }
-
-  /// Trata exceções de rede
-  Exception _handleNetworkError(dynamic error, String operationName) {
-    if (error.toString().contains('SocketException') ||
-        error.toString().contains('TimeoutException') ||
-        error.toString().contains('Network is unreachable')) {
-      return Exception(
-          'Erro de conexão: Verifique sua internet e tente novamente');
-    } else if (error.toString().contains('Connection refused') ||
-        error.toString().contains('Connection reset')) {
-      return Exception(
-          'Erro de servidor: Serviço temporariamente indisponível');
-    } else {
-      return Exception('Erro ao $operationName: ${error.toString()}');
     }
   }
 
@@ -96,7 +81,8 @@ class PessoaService extends GetConnect {
           .map((json) => Pessoa.fromMap(json as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      throw _handleNetworkError(e, 'pesquisar pessoas');
+      print('❌ Erro ao pesquisar pessoas: $e');
+      return [];
     }
   }
 
@@ -120,7 +106,8 @@ class PessoaService extends GetConnect {
               json as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      throw _handleNetworkError(e, 'pesquisar família responsável nova renda');
+      print('❌ Erro ao pesquisar família responsável nova renda: $e');
+      return [];
     }
   }
 
@@ -144,7 +131,8 @@ class PessoaService extends GetConnect {
               json as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      throw _handleNetworkError(e, 'pesquisar família pessoa nova renda');
+      print('❌ Erro ao pesquisar família pessoa nova renda: $e');
+      return [];
     }
   }
 
@@ -168,7 +156,8 @@ class PessoaService extends GetConnect {
               json as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      throw _handleNetworkError(e, 'pesquisar pessoa programa nova renda');
+      print('❌ Erro ao pesquisar pessoa programa nova renda: $e');
+      return [];
     }
   }
 
@@ -191,7 +180,8 @@ class PessoaService extends GetConnect {
               VwNovaRendaMesModel.fromJson(json as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      throw _handleNetworkError(e, 'pesquisar nova renda mês');
+      print('❌ Erro ao pesquisar nova renda mês: $e');
+      return [];
     }
   }
 
@@ -215,7 +205,8 @@ class PessoaService extends GetConnect {
               json as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      throw _handleNetworkError(e, 'pesquisar histórico família pessoa');
+      print('❌ Erro ao pesquisar histórico família pessoa: $e');
+      return [];
     }
   }
 }

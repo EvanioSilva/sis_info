@@ -95,9 +95,10 @@ class LoginController extends GetxController {
         );
       }
     } catch (e) {
+      print('❌ Erro ao realizar login: $e');
       appController.showSnackbar(
         'Erro',
-        'Erro ao realizar login: ${e.toString()}',
+        'Erro ao realizar login',
         cor: Colors.red,
       );
     } finally {
