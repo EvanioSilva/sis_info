@@ -919,15 +919,22 @@ class DetalhesPessoaPage extends StatelessWidget {
               'Histórico', 'Nenhum histórico encontrado', Icons.history);
         }
 
-        return _buildInfoSection(Get.context!, 'Histórico', Icons.history, [
-          _buildInfoRow(
-              Get.context!, 'Total de Registros', ctrl.historicoDados.length.toString()),
-          _buildInfoRow(
-              Get.context!,
-              'ID Família',
-              ctrl.historicoDados.first.idfamilia?.toString() ??
-                  'Não informado'),
-        ]);
+        try {
+          return _buildInfoSection(Get.context!, 'Histórico', Icons.history, [
+            _buildInfoRow(
+                Get.context!, 'Total de Registros', ctrl.historicoDados.length.toString()),
+            _buildInfoRow(
+                Get.context!,
+                'ID Família',
+                ctrl.historicoDados.isNotEmpty && ctrl.historicoDados.first.idfamilia != null
+                    ? ctrl.historicoDados.first.idfamilia!.toString()
+                    : 'Não informado'),
+          ]);
+        } catch (e) {
+          print('❌ Erro ao exibir histórico: $e');
+          return _buildEmptySection(
+              'Histórico', 'Erro ao carregar histórico', Icons.history);
+        }
       },
     );
   }

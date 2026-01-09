@@ -23,13 +23,18 @@ class PessoaService extends GetConnect {
 
   /// Trata resposta da API de forma segura
   dynamic _handleResponse(Response response, String operationName) {
-    if (response.statusCode == 200) {
-      return response.body;
-    } else {
-      final statusCode = response.statusCode ?? 'desconhecido';
-      final body = response.body?.toString() ?? 'sem resposta';
-      print('❌ Erro ao $operationName: Status $statusCode - $body');
-      throw Exception('Erro ao $operationName: $statusCode - $body');
+    try {
+      if (response.statusCode == 200) {
+        return response.body;
+      } else {
+        final statusCode = response.statusCode ?? 'desconhecido';
+        final body = response.body?.toString() ?? 'sem resposta';
+        print('❌ Erro ao $operationName: Status $statusCode - $body');
+        return null; // Retorna null ao invés de lançar exceção
+      }
+    } catch (e) {
+      print('❌ Erro ao processar resposta em $operationName: $e');
+      return null;
     }
   }
 
@@ -75,11 +80,29 @@ class PessoaService extends GetConnect {
       }
 
       final response = await get('/PesquisarPessoas', query: queryParams);
-      final jsonList =
-          _handleResponse(response, 'buscar pessoas') as List<dynamic>;
-      return jsonList
-          .map((json) => Pessoa.fromMap(json as Map<String, dynamic>))
-          .toList();
+      final jsonList = _handleResponse(response, 'buscar pessoas');
+      
+      if (jsonList == null || jsonList is! List) {
+        print('❌ Resposta inválida ao pesquisar pessoas');
+        return [];
+      }
+      
+      try {
+        return jsonList
+            .map((json) {
+              try {
+                return Pessoa.fromMap(json as Map<String, dynamic>);
+              } catch (e) {
+                print('❌ Erro ao converter pessoa: $e');
+                return null;
+              }
+            })
+            .whereType<Pessoa>()
+            .toList();
+      } catch (e) {
+        print('❌ Erro ao processar lista de pessoas: $e');
+        return [];
+      }
     } catch (e) {
       print('❌ Erro ao pesquisar pessoas: $e');
       return [];
@@ -99,12 +122,30 @@ class PessoaService extends GetConnect {
 
       final response = await get('/PesquisarVwFamiliaResponsavelNovaRenda',
           query: queryParams);
-      final jsonList = _handleResponse(response, 'buscar família responsável')
-          as List<dynamic>;
-      return jsonList
-          .map((json) => VwFamiliaResponsavelNovaRendaModel.fromJson(
-              json as Map<String, dynamic>))
-          .toList();
+      final jsonList = _handleResponse(response, 'buscar família responsável');
+      
+      if (jsonList == null || jsonList is! List) {
+        print('❌ Resposta inválida ao pesquisar família responsável');
+        return [];
+      }
+      
+      try {
+        return jsonList
+            .map((json) {
+              try {
+                return VwFamiliaResponsavelNovaRendaModel.fromJson(
+                    json as Map<String, dynamic>);
+              } catch (e) {
+                print('❌ Erro ao converter família responsável: $e');
+                return null;
+              }
+            })
+            .whereType<VwFamiliaResponsavelNovaRendaModel>()
+            .toList();
+      } catch (e) {
+        print('❌ Erro ao processar lista de família responsável: $e');
+        return [];
+      }
     } catch (e) {
       print('❌ Erro ao pesquisar família responsável nova renda: $e');
       return [];
@@ -124,12 +165,30 @@ class PessoaService extends GetConnect {
 
       final response =
           await get('/PesquisarVwFamiliaPessoaNovaRenda', query: queryParams);
-      final jsonList =
-          _handleResponse(response, 'buscar família pessoa') as List<dynamic>;
-      return jsonList
-          .map((json) => VwFamiliaPessoaNovaRendaModel.fromJson(
-              json as Map<String, dynamic>))
-          .toList();
+      final jsonList = _handleResponse(response, 'buscar família pessoa');
+      
+      if (jsonList == null || jsonList is! List) {
+        print('❌ Resposta inválida ao pesquisar família pessoa');
+        return [];
+      }
+      
+      try {
+        return jsonList
+            .map((json) {
+              try {
+                return VwFamiliaPessoaNovaRendaModel.fromJson(
+                    json as Map<String, dynamic>);
+              } catch (e) {
+                print('❌ Erro ao converter família pessoa: $e');
+                return null;
+              }
+            })
+            .whereType<VwFamiliaPessoaNovaRendaModel>()
+            .toList();
+      } catch (e) {
+        print('❌ Erro ao processar lista de família pessoa: $e');
+        return [];
+      }
     } catch (e) {
       print('❌ Erro ao pesquisar família pessoa nova renda: $e');
       return [];
@@ -149,12 +208,30 @@ class PessoaService extends GetConnect {
 
       final response =
           await get('/PesquisarVwPessoaProgramaNovaRenda', query: queryParams);
-      final jsonList =
-          _handleResponse(response, 'buscar pessoa programa') as List<dynamic>;
-      return jsonList
-          .map((json) => VwPessoaProgramaNovaRendaModel.fromJson(
-              json as Map<String, dynamic>))
-          .toList();
+      final jsonList = _handleResponse(response, 'buscar pessoa programa');
+      
+      if (jsonList == null || jsonList is! List) {
+        print('❌ Resposta inválida ao pesquisar pessoa programa');
+        return [];
+      }
+      
+      try {
+        return jsonList
+            .map((json) {
+              try {
+                return VwPessoaProgramaNovaRendaModel.fromJson(
+                    json as Map<String, dynamic>);
+              } catch (e) {
+                print('❌ Erro ao converter pessoa programa: $e');
+                return null;
+              }
+            })
+            .whereType<VwPessoaProgramaNovaRendaModel>()
+            .toList();
+      } catch (e) {
+        print('❌ Erro ao processar lista de pessoa programa: $e');
+        return [];
+      }
     } catch (e) {
       print('❌ Erro ao pesquisar pessoa programa nova renda: $e');
       return [];
@@ -173,12 +250,29 @@ class PessoaService extends GetConnect {
 
       final response =
           await get('/PesquisarVwNovaRendaMes', query: queryParams);
-      final jsonList =
-          _handleResponse(response, 'buscar nova renda mês') as List<dynamic>;
-      return jsonList
-          .map((json) =>
-              VwNovaRendaMesModel.fromJson(json as Map<String, dynamic>))
-          .toList();
+      final jsonList = _handleResponse(response, 'buscar nova renda mês');
+      
+      if (jsonList == null || jsonList is! List) {
+        print('❌ Resposta inválida ao pesquisar nova renda mês');
+        return [];
+      }
+      
+      try {
+        return jsonList
+            .map((json) {
+              try {
+                return VwNovaRendaMesModel.fromJson(json as Map<String, dynamic>);
+              } catch (e) {
+                print('❌ Erro ao converter nova renda mês: $e');
+                return null;
+              }
+            })
+            .whereType<VwNovaRendaMesModel>()
+            .toList();
+      } catch (e) {
+        print('❌ Erro ao processar lista de nova renda mês: $e');
+        return [];
+      }
     } catch (e) {
       print('❌ Erro ao pesquisar nova renda mês: $e');
       return [];
@@ -198,12 +292,32 @@ class PessoaService extends GetConnect {
 
       final response =
           await get('/PesquisarVwHistoricoFamiliaPessoa', query: queryParams);
-      final jsonList = _handleResponse(response, 'buscar histórico família')
-          as List<dynamic>;
-      return jsonList
-          .map((json) => VwHistoricoFamiliaPessoaModel.fromJson(
-              json as Map<String, dynamic>))
-          .toList();
+      
+      final jsonList = _handleResponse(response, 'buscar histórico família');
+      
+      // Verificar se jsonList é válido antes de processar
+      if (jsonList == null || jsonList is! List) {
+        print('❌ Resposta inválida ao pesquisar histórico família pessoa');
+        return [];
+      }
+      
+      try {
+        return jsonList
+            .map((json) {
+              try {
+                return VwHistoricoFamiliaPessoaModel.fromJson(
+                    json as Map<String, dynamic>);
+              } catch (e) {
+                print('❌ Erro ao converter item do histórico: $e');
+                return null;
+              }
+            })
+            .whereType<VwHistoricoFamiliaPessoaModel>()
+            .toList();
+      } catch (e) {
+        print('❌ Erro ao processar lista do histórico: $e');
+        return [];
+      }
     } catch (e) {
       print('❌ Erro ao pesquisar histórico família pessoa: $e');
       return [];

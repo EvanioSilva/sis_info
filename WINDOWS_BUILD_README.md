@@ -114,3 +114,4 @@ O executável debug estará em: `build/windows/x64/runner/Debug/`
 - `build_windows.bat` - Script para Windows
 - `build_apk.sh` - Script para Android (referência)
 
+
